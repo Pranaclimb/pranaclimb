@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathing Bubble - Big/Small Cues</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0083B0 0%, #00B4DB 50%, #00D4FF 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 212, 255, 0.1);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .header {
+            color: #003d5c;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .bubble-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+        }
+
+        .bubble {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(0, 180, 219, 0.6));
+            box-shadow: 0 20px 60px rgba(0, 131, 176, 0.4),
+                        inset 0 0 40px rgba(255, 255, 255, 0.6);
+            position: relative;
+            transition: transform 5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bubble.inhale {
+            transform: scale(1.5);
+        }
+
+        .bubble.exhale {
+            transform: scale(0.7);
+        }
+
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50%;
+            filter: blur(10px);
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 15%;
+            right: 20%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4), transparent);
+            border-radius: 50%;
+            filter: blur(15px);
+        }
+
+        .cue-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00587a;
+            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            transition: opacity 0.5s;
+        }
+
+        .phase-indicator {
+            color: #003d5c;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            height: 25px;
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .slider-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(0, 180, 219, 0.5);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .slider-label {
+            color: #003d5c;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .slider-item {
+            text-align: center;
+        }
+
+        .slider-item label {
+            display: block;
+            color: #0083B0;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .slider-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00587a;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #00B4DB 0%, #0083B0 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #00587a;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 131, 176, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #00587a;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 131, 176, 0.5);
+        }
+
+        .btn {
+            padding: 10px 30px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            color: #003d5c;
+            border: 2px solid rgba(0, 180, 219, 0.5);
+            margin-top: 15px;
+        }
+
+        .info-box h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #00587a;
+        }
+
+        .info-box p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .comparison-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 180, 219, 0.3);
+        }
+
+        .comparison-item h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #00587a;
+        }
+
+        .comparison-item.modified {
+            border-color: #00B4DB;
+            background: rgba(0, 180, 219, 0.2);
+        }
+
+        .comparison-item.modified h4 {
+            color: #0083B0;
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #00B4DB;
+        }
+
+        @media (max-width: 768px) {
+            .bubble-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .cue-text {
+                font-size: 2rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border: 3px solid rgba(0, 212, 255, 0.7);
+            border-radius: 50%;
+            animation: ripple-animation 5s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            0% {
+                width: 100%;
+                height: 100%;
+                opacity: 1;
+                top: 0;
+                left: 0;
+            }
+            100% {
+                width: 150%;
+                height: 150%;
+                opacity: 0;
+                top: -25%;
+                left: -25%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🫁 Breathing Bubble</h1>
+            <p>Make Yourself Big • Make Yourself Small</p>
+        </div>
+
+        <div class="phase-indicator" id="phaseText">Click Start to Begin</div>
+
+        <div class="bubble-container">
+            <div class="bubble" id="bubble">
+                <div class="cue-text" id="cueText"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-container">
+                <div class="slider-label">Breathing Rhythm</div>
+                <div class="slider-grid">
+                    <div class="slider-item">
+                        <label>Inhale (seconds)</label>
+                        <div class="slider-value" id="inhaleValue">6</div>
+                        <input type="range" id="inhaleSlider" min="6" max="10" value="6" oninput="updateTiming()">
+                    </div>
+                    <div class="slider-item">
+                        <label>Exhale (seconds)</label>
+                        <div class="slider-value" id="exhaleValue">6</div>
+                        <input type="range" id="exhaleSlider" min="6" max="10" value="6" oninput="updateTiming()">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-row">
+                <button class="btn btn-start" id="startBtn" onclick="startBreathing()">Start Breathing</button>
+                <button class="btn btn-stop" id="stopBtn" onclick="stopBreathing()" style="display: none;">Stop</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>🧪 The Science Behind the Cue</h3>
+            <p><strong>Fagevik Olsén et al. (2011)</strong> discovered that the words we use to cue breathing directly affect chest expansion:</p>
+            
+            <div class="comparison">
+                <div class="comparison-item">
+                    <h4>Traditional Cue</h4>
+                    <p>"Breathe in maximally"</p>
+                    <p>"Breathe out maximally"</p>
+                </div>
+                
+                <div class="comparison-item modified">
+                    <h4>✅ Modified Cue</h4>
+                    <p>"Breathe in maximally and make yourself as <strong>BIG</strong> as possible"</p>
+                    <p>"Breathe out maximally and make yourself as <strong>SMALL</strong> as possible"</p>
+                    <div class="stats">+1.4 cm upper ribcage<br>+0.9 cm lower ribcage</div>
+                </div>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Key Insight:</strong> Same breath. Different cue. Better mobility.</p>
+            <p>How we cue the breath changes how the body responds. This is crucial for climbing coaching and breathwork training.</p>
+        </div>
+    </div>
+
+    <script>
+        let isBreathing = false;
+        let breathInterval;
+        let inhaleTime = 6000;
+        let exhaleTime = 6000;
+
+        const phases = [
+            { 
+                name: 'Inhale: Make yourself BIG', 
+                cue: 'BIG',
+                getDuration: () => inhaleTime,
+                class: 'inhale' 
+            },
+            { 
+                name: 'Exhale: Make yourself SMALL', 
+                cue: 'SMALL',
+                getDuration: () => exhaleTime,
+                class: 'exhale' 
+            }
+        ];
+
+        let currentPhase = 0;
+
+        function updateTiming() {
+            const inhaleSlider = document.getElementById('inhaleSlider');
+            const exhaleSlider = document.getElementById('exhaleSlider');
+            const inhaleValue = document.getElementById('inhaleValue');
+            const exhaleValue = document.getElementById('exhaleValue');
+            
+            inhaleTime = parseInt(inhaleSlider.value) * 1000;
+            exhaleTime = parseInt(exhaleSlider.value) * 1000;
+            
+            inhaleValue.textContent = inhaleSlider.value;
+            exhaleValue.textContent = exhaleSlider.value;
+            
+            // Update bubble transition timing
+            const bubble = document.getElementById('bubble');
+            const totalTime = (inhaleTime + exhaleTime) / 2000; // average for smooth transition
+            bubble.style.transition = `transform ${totalTime}s cubic-bezier(0.4, 0, 0.2, 1)`;
+        }
+
+        function startBreathing() {
+            isBreathing = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            currentPhase = 0;
+            runBreathCycle();
+        }
+
+        function stopBreathing() {
+            isBreathing = false;
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            clearTimeout(breathInterval);
+            
+            const bubble = document.getElementById('bubble');
+            const phaseText = document.getElementById('phaseText');
+            const cueText = document.getElementById('cueText');
+            
+            bubble.className = 'bubble';
+            phaseText.textContent = 'Click Start to Begin';
+            cueText.textContent = '';
+        }
+
+        function runBreathCycle() {
+            if (!isBreathing) return;
+
+            const phase = phases[currentPhase % phases.length];
+            const bubble = document.getElementById('bubble');
+            const phaseText = document.getElementById('phaseText');
+            const cueText = document.getElementById('cueText');
+            const duration = phase.getDuration();
+
+            phaseText.textContent = phase.name;
+            cueText.textContent = phase.cue;
+            bubble.className = 'bubble ' + phase.class;
+
+            // Create ripple effect
+            if (phase.class === 'inhale') {
+                createRipple();
+            }
+
+            breathInterval = setTimeout(() => {
+                currentPhase++;
+                runBreathCycle();
+            }, duration);
+        }
+
+        function createRipple() {
+            const container = document.querySelector('.bubble-container');
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.animation = `ripple-animation ${inhaleTime/1000}s ease-out`;
+            container.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, inhaleTime);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isBreathing) {
+                    stopBreathing();
+                } else {
+                    startBreathing();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

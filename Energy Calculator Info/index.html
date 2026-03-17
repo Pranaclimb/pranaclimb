@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PranaClimb Energy-Cost Calculator · Info Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #ffffff;
+      --surface:   #f9fafb;
+      --surfaceAlt:#e5e7eb;
+      --b1:        #aaff00;
+      --b2:        #89cff0;
+      --title:     #ff00ff;
+      --text:      #111111;
+      --textMid:   #444444;
+      --textMuted: #888888;
+      --accent:    #f97316;
+      --green:     #16a34a;
+      --red:       #dc2626;
+      --yellow:    #ca8a04;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+    /* HERO */
+    .hero {
+      background: var(--bg);
+      border-bottom: 3px solid var(--b1);
+      padding: 48px 24px 40px;
+      box-shadow: 0 2px 24px #aaff0025;
+    }
+    .hero-inner { max-width: 720px; margin: 0 auto; }
+    .hero-tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.2em;
+      color: var(--textMuted); margin-bottom: 12px;
+      border: 1px solid var(--b2); border-radius: 20px;
+      padding: 3px 14px;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(42px, 8vw, 72px);
+      letter-spacing: 0.06em; line-height: 0.95;
+      color: var(--title); margin-bottom: 8px;
+    }
+    .hero-subtitle {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(18px, 3vw, 26px);
+      letter-spacing: 0.1em; color: var(--textMid);
+      margin-bottom: 20px;
+    }
+    .hero-desc {
+      font-size: 15px; color: var(--textMid);
+      max-width: 560px; line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      padding: 5px 14px; border-radius: 20px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .chip-lime  { background: #f5ffe0; color: #4d7a00; border: 1.5px solid var(--b1); }
+    .chip-blue  { background: #eff9ff; color: #0369a1; border: 1.5px solid var(--b2); }
+    .chip-pink  { background: #fff0ff; color: #c026d3; border: 1.5px solid var(--title); }
+
+    /* MAIN LAYOUT */
+    .page { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* SECTION */
+    .section { margin-bottom: 52px; }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.25em;
+      color: var(--textMuted); text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 6px;
+    }
+    .section-heading {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 30px; letter-spacing: 0.08em;
+      color: var(--text); margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--b1);
+    }
+    .section-heading span { color: var(--title); }
+
+    p { font-size: 14px; color: var(--textMid); margin-bottom: 14px; line-height: 1.75; }
+    p:last-child { margin-bottom: 0; }
+
+    /* CALLOUT */
+    .callout {
+      border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+    }
+    .callout-lime  { background: #f5ffe0; border-left: 4px solid var(--b1); }
+    .callout-blue  { background: #eff9ff; border-left: 4px solid var(--b2); }
+    .callout-pink  { background: #fff0ff; border-left: 4px solid var(--title); }
+    .callout-orange{ background: #fff7ed; border-left: 4px solid var(--accent); }
+    .callout-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 6px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .callout-lime  .callout-title { color: #4d7a00; }
+    .callout-blue  .callout-title { color: #0369a1; }
+    .callout-pink  .callout-title { color: #c026d3; }
+    .callout-orange .callout-title { color: #c2410c; }
+    .callout p { font-size: 13px; margin-bottom: 0; }
+
+    /* ZONE TABLE */
+    .zone-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    .zone-table th {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; color: var(--textMuted);
+      padding: 8px 12px; border-bottom: 2px solid var(--b1);
+      text-align: left;
+    }
+    .zone-table td { padding: 12px 12px; border-bottom: 1px solid var(--surfaceAlt); vertical-align: top; }
+    .zone-table tr:last-child td { border-bottom: none; }
+    .zone-table tr:hover td { background: var(--surface); }
+    .zone-name-cell { font-weight: 700; font-family: 'DM Sans', sans-serif; }
+    .mono-cell { font-family: 'DM Mono', monospace; }
+
+    /* MOD TABLE */
+    .mod-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    .mod-table th {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; color: var(--textMuted);
+      padding: 8px 12px; border-bottom: 2px solid var(--b2); text-align: left;
+    }
+    .mod-table td { padding: 10px 12px; border-bottom: 1px solid var(--surfaceAlt); font-size: 13px; }
+    .mod-table tr:last-child td { border-bottom: none; }
+    .mod-table tr:hover td { background: var(--surface); }
+    .mult { font-family: 'DM Mono', monospace; font-weight: 700; }
+    .mult-red    { color: var(--red); }
+    .mult-green  { color: var(--green); }
+
+    /* FORMULA BOX */
+    .formula-box {
+      background: var(--surface);
+      border: 2px solid var(--b1);
+      border-radius: 14px; padding: 24px 28px;
+      margin-bottom: 24px;
+      font-family: 'DM Mono', monospace;
+    }
+    .formula-box .f-title {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--textMuted); margin-bottom: 10px;
+    }
+    .formula-main {
+      font-size: clamp(14px, 2.5vw, 18px); color: var(--text);
+      font-weight: 700; margin-bottom: 8px; line-height: 1.5;
+    }
+    .formula-main span.var { color: var(--title); }
+    .formula-main span.op  { color: var(--textMuted); }
+    .formula-note { font-size: 11px; color: var(--textMuted); line-height: 1.6; }
+
+    /* STEP CARDS */
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .step-card {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--surface); border: 1.5px solid var(--surfaceAlt);
+      border-radius: 12px; padding: 16px 20px;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--title); color: #fff;
+      font-family: 'Bebas Neue', cursive; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      font-weight: 700; color: var(--text); margin-bottom: 4px;
+    }
+    .step-content p { font-size: 13px; margin-bottom: 0; }
+
+    /* EXAMPLE BOX */
+    .example-box {
+      background: #fff0ff; border: 1.5px solid var(--title);
+      border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+    }
+    .example-title {
+      font-family: 'Bebas Neue', cursive; font-size: 16px;
+      letter-spacing: 0.12em; color: var(--title); margin-bottom: 14px;
+    }
+    .example-row {
+      display: flex; justify-content: space-between;
+      border-bottom: 1px solid #f0c4ff; padding: 6px 0; font-size: 13px;
+    }
+    .example-row:last-child { border-bottom: none; }
+    .example-key { color: var(--textMid); }
+    .example-val { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--text); }
+    .example-result {
+      margin-top: 14px; padding-top: 14px;
+      border-top: 2px solid var(--title);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .example-result-label { font-size: 11px; letter-spacing: 0.15em; color: var(--textMuted); font-family: 'DM Mono', monospace; }
+    .example-result-val { font-family: 'Bebas Neue', cursive; font-size: 36px; color: var(--title); letter-spacing: 0.04em; }
+
+    /* W' BOX */
+    .wprime-box {
+      background: var(--surface); border: 1.5px solid var(--b2);
+      border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+    }
+
+    /* DISCLAIMER */
+    .disclaimer {
+      background: var(--surface); border-top: 3px solid var(--b1);
+      padding: 32px 24px; text-align: center;
+    }
+    .disclaimer-inner { max-width: 720px; margin: 0 auto; }
+    .disclaimer p {
+      font-size: 12px; color: var(--textMuted);
+      letter-spacing: 0.04em; margin-bottom: 6px;
+    }
+    .disclaimer .copy {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 0.1em; color: var(--surfaceAlt);
+      color: #bbb; margin-top: 12px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 480px) {
+      .hero { padding: 32px 16px 28px; }
+      .page { padding: 32px 16px 60px; }
+      .formula-main { font-size: 13px; }
+      .zone-table, .mod-table { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">FIELD GUIDE · v1.0</div>
+      <div style="margin-bottom:14px;">
+        <a href="https://pranaclimb.github.io/Pranaclimb-Energy-Calculator/" style="
+          display:inline-flex; align-items:center; gap:6px;
+          font-size:11px; font-weight:700; letter-spacing:0.1em;
+          color:#c026d3; text-decoration:none;
+          border:1.5px solid #ff00ff; border-radius:20px;
+          padding:5px 14px; background:#fff0ff;
+          font-family:'DM Sans',sans-serif; transition:all 0.2s;
+        " onmouseover="this.style.background='#ff00ff';this.style.color='#fff';"
+           onmouseout="this.style.background='#fff0ff';this.style.color='#c026d3';">
+          ← BACK TO CALCULATOR
+        </a>
+      </div>
+      <div class="hero-title">PRANACLIMB</div>
+      <div class="hero-subtitle">ENERGY-COST CALCULATOR — HOW IT WORKS</div>
+      <p class="hero-desc">
+        A climbing-specific metabolic estimation tool built on Breathing Rate (BR),
+        Rate of Perceived Exertion (RPE), Critical Power (CP) theory, and W′bal mechanics.
+        Designed for coaches and athletes to track <strong>relative change</strong> in
+        energy cost, pacing, and efficiency over time.
+      </p>
+      <div class="hero-chips">
+        <span class="chip chip-lime">⚡ Field-Ready</span>
+        <span class="chip chip-blue">🔬 Research-Backed</span>
+        <span class="chip chip-pink">🧗 Climbing-Specific</span>
+        <span class="chip chip-lime">📊 Validated ~10–11 kcal/min @ 70 kg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- ── WHAT IS A MET ── -->
+    <div class="section">
+      <div class="section-label">Background</div>
+      <div class="section-heading">WHAT IS A <span>MET?</span></div>
+      <p>
+        A MET (Metabolic Equivalent of Task) is a unit that compares the energy cost of an activity
+        to your resting metabolic rate. 1 MET = the energy you expend sitting still
+        (≈ 3.5 ml O₂/kg/min). Rock climbing at moderate intensity sits around 9 METs —
+        meaning your body is working roughly <strong>9× harder than rest</strong>.
+      </p>
+      <div class="callout callout-blue">
+        <div class="callout-title">9 METs in practice</div>
+        <p>At 9 METs a climber burns approximately <strong>9 kcal per kilogram of body weight per hour</strong>.
+        This is equivalent to running at 5–6 mph, fast stair climbing, or vigorous cycling.</p>
+      </div>
+      <p>
+        The PranaClimb calculator goes beyond generic METs by layering in
+        climbing-specific variables: breathing rate zone, terrain angle, grip type,
+        movement efficiency, and psychological load — all of which meaningfully shift
+        actual energy expenditure.
+      </p>
+    </div>
+
+    <!-- ── THE CORE FORMULA ── -->
+    <div class="section">
+      <div class="section-label">Methodology</div>
+      <div class="section-heading">THE CORE <span>FORMULA</span></div>
+
+      <div class="formula-box">
+        <div class="f-title">Step-by-step calculation</div>
+        <div class="formula-main">
+          <span class="var">kcal/min</span>
+          <span class="op"> = </span>
+          BaseRate
+          <span class="op"> × </span>
+          (Mass<span class="op"> / </span>70)
+          <span class="op"> × </span>
+          Modifiers
+        </div>
+        <div class="formula-main">
+          <span class="var">Total kcal</span>
+          <span class="op"> = </span>
+          kcal/min
+          <span class="op"> × </span>
+          Duration (min)
+        </div>
+        <div class="formula-note">
+          Base rate is derived from the selected effort zone (BR / RPE).<br />
+          Mass ratio normalises output to the 70 kg research baseline.<br />
+          Modifiers stack multiplicatively from terrain, grip, technique, and efficiency factors.
+        </div>
+      </div>
+
+      <div class="callout callout-lime">
+        <div class="callout-title">Research Baseline</div>
+        <p>Average outdoor climbing energy expenditure is <strong>10–11 kcal/min</strong> for a 70 kg climber,
+        ranging from ~9 kcal/min on easier routes to ~13 kcal/min on difficult terrain,
+        with steep overhang adding up to +5 kcal/min above slab baselines.</p>
+      </div>
+    </div>
+
+    <!-- ── EFFORT ZONES ── -->
+    <div class="section">
+      <div class="section-label">Zones</div>
+      <div class="section-heading">EFFORT <span>ZONES</span></div>
+      <p>
+        Zone selection is based on <strong>Breathing Rate (BR)</strong> — breaths per minute —
+        or <strong>CR-10 RPE</strong>. BR is preferred as it is observable without equipment
+        and correlates closely with oxygen consumption and actual metabolic cost.
+      </p>
+
+      <table class="zone-table">
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>BR Range</th>
+            <th>RPE (CR-10)</th>
+            <th>Base Rate</th>
+            <th>Physiological State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="zone-name-cell" style="color:#16a34a;">🟢 Below CP</td>
+            <td class="mono-cell">&lt; 45 BPM</td>
+            <td class="mono-cell">≤ 7</td>
+            <td class="mono-cell"><strong>9–10 kcal/min</strong></td>
+            <td>Fully aerobic, sustainable. W′bal recovering or stable.</td>
+          </tr>
+          <tr>
+            <td class="zone-name-cell" style="color:#ca8a04;">🟡 Grey Zone</td>
+            <td class="mono-cell">45–55 BPM</td>
+            <td class="mono-cell">8–9</td>
+            <td class="mono-cell"><strong>10–12 kcal/min</strong></td>
+            <td>CP threshold boundary. Aerobic capacity near limit; borderline sustainable.</td>
+          </tr>
+          <tr>
+            <td class="zone-name-cell" style="color:#dc2626;">🔴 Above RCP</td>
+            <td class="mono-cell">&gt; 55 BPM</td>
+            <td class="mono-cell">≥ 9.5</td>
+            <td class="mono-cell"><strong>12–16+ kcal/min</strong></td>
+            <td>Severe domain. W′bal depleting rapidly. Anaerobic contribution significant.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-orange">
+        <div class="callout-title">Why Breathing Rate?</div>
+        <p>BR is a practical field proxy for oxygen consumption (V̇O₂). It is observable,
+        requires no equipment, and — unlike heart rate — is not significantly confounded
+        by psychological arousal alone. Combined with RPE, it provides a reliable real-time
+        intensity signal for climbers and coaches.</p>
+      </div>
+    </div>
+
+    <!-- ── CRITICAL POWER ── -->
+    <div class="section">
+      <div class="section-label">Theory</div>
+      <div class="section-heading">CRITICAL POWER <span>&amp; W′</span></div>
+      <p>
+        <strong>Critical Power (CP)</strong> is the highest sustainable power output in a fully
+        aerobic steady state — roughly the intensity a climber can maintain for ~30 minutes
+        before exhaustion (Vanhatalo et al., 2011). Above CP, every effort draws on
+        <strong>W′</strong> (pronounced "W prime") — a finite anaerobic work capacity.
+      </p>
+
+      <div class="formula-box">
+        <div class="f-title">W′ Balance Equation</div>
+        <div class="formula-main">
+          <span class="var">W′</span>
+          <span class="op"> = </span>
+          T<sub>lim</sub>
+          <span class="op"> × </span>
+          (P <span class="op">−</span> CP)
+        </div>
+        <div class="formula-note">
+          T<sub>lim</sub> = time to exhaustion above CP (seconds)<br />
+          P = constant power output above CP<br />
+          CP = critical power threshold<br /><br />
+          <strong>Example:</strong> sustaining 250W for 6 min above a CP of 200W
+          → W′ = 6 × (250 − 200) = <strong>300 J</strong>
+        </div>
+      </div>
+
+      <div class="wprime-box">
+        <p style="font-weight:700;color:var(--text);margin-bottom:10px;">W′bal in the calculator</p>
+        <p>The W′bal overlay in the Session Log helps estimate cumulative depletion across burns:</p>
+        <div style="margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--surfaceAlt);font-size:13px;">
+            <span style="color:var(--textMid);">Above CP crux (per 10s)</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red);">+15–30% depletion</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--surfaceAlt);font-size:13px;">
+            <span style="color:var(--textMid);">Above RCP (BR &gt;55)</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red);">+20–40% depletion</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--surfaceAlt);font-size:13px;">
+            <span style="color:var(--textMid);">Below CP rest (per 10s)</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--green);">−10–20% recovery</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;">
+            <span style="color:var(--textMid);">Passive kneebar / no-hands</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--green);">Aerobic recharge</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODIFIERS ── -->
+    <div class="section">
+      <div class="section-label">Modifiers</div>
+      <div class="section-heading">TERRAIN &amp; <span>TECHNIQUE MODIFIERS</span></div>
+      <p>
+        Modifiers stack multiplicatively on top of the base kcal/min rate.
+        They account for the additional metabolic demand of specific terrain,
+        grip types, movement quality, and psychological state.
+      </p>
+
+      <table class="mod-table">
+        <thead>
+          <tr><th>Modifier</th><th>Multiplier</th><th>Why it matters</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Steep terrain (&gt;100°)</td>
+            <td><span class="mult mult-red">×1.2 – ×1.4</span></td>
+            <td>Overhang dramatically increases upper-body and core anaerobic cost</td>
+          </tr>
+          <tr>
+            <td>Crimps / Pockets</td>
+            <td><span class="mult mult-red">×1.1 – ×1.3</span></td>
+            <td>Closed-hand positions elevate forearm oxygen demand significantly</td>
+          </tr>
+          <tr>
+            <td>Inefficient movement</td>
+            <td><span class="mult mult-red">×1.1 – ×1.3</span></td>
+            <td>Rigid shoulders and over-gripping raise BR and total energy cost</td>
+          </tr>
+          <tr>
+            <td>Fear / Anxiety</td>
+            <td><span class="mult mult-red">×1.1 – ×1.4</span></td>
+            <td>Psychological arousal elevates HR beyond metabolic demand alone</td>
+          </tr>
+          <tr>
+            <td>Flow state</td>
+            <td><span class="mult mult-green">×0.85 – ×0.90</span></td>
+            <td>Smooth, efficient movement reduces unnecessary muscular tension</td>
+          </tr>
+          <tr>
+            <td>Open-hand grip</td>
+            <td><span class="mult mult-green">×0.85 – ×0.95</span></td>
+            <td>Reduced forearm tension lowers local O₂ demand and delays fatigue</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-lime">
+        <div class="callout-title">Familiarity Effect</div>
+        <p>Research shows energy expenditure decreases on familiar routes and with repeated ascents,
+        as movement becomes more economical. This is captured by the flow state and open-hand
+        efficiency bonuses, and is a key reason to track <em>relative</em> cost over time.</p>
+      </div>
+    </div>
+
+    <!-- ── WORKED EXAMPLE ── -->
+    <div class="section">
+      <div class="section-label">Example</div>
+      <div class="section-heading">WORKED <span>EXAMPLE</span></div>
+      <p>A 63 kg climber on a 30m steep sport redpoint attempt, Grey Zone effort, 16 minutes total.</p>
+
+      <div class="example-box">
+        <div class="example-title">📋 EXAMPLE CALCULATION</div>
+        <div class="example-row"><span class="example-key">Body mass</span><span class="example-val">63 kg</span></div>
+        <div class="example-row"><span class="example-key">Mass ratio (63 ÷ 70)</span><span class="example-val">0.90</span></div>
+        <div class="example-row"><span class="example-key">Effort zone</span><span class="example-val">🟡 Grey Zone → 11 kcal/min</span></div>
+        <div class="example-row"><span class="example-key">Terrain modifier (steep overhang)</span><span class="example-val">×1.3</span></div>
+        <div class="example-row"><span class="example-key">Base × mass ratio</span><span class="example-val">11 × 0.9 = 9.9 kcal/min</span></div>
+        <div class="example-row"><span class="example-key">After terrain modifier</span><span class="example-val">9.9 × 1.3 = 12.87 kcal/min</span></div>
+        <div class="example-row"><span class="example-key">Duration</span><span class="example-val">16 min</span></div>
+        <div class="example-result">
+          <span class="example-result-label">TOTAL ENERGY COST</span>
+          <span class="example-result-val">206 kcal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HOW TO USE ── -->
+    <div class="section">
+      <div class="section-label">Usage</div>
+      <div class="section-heading">HOW TO <span>USE THE APP</span></div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Enter Athlete Metrics</h4>
+            <p>Input body mass and planned climb duration. Select the climbing style (Sport, Boulder, Trad, Big Wall) for context tracking.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Select Your Effort Zone</h4>
+            <p>Choose the zone based on observed Breathing Rate or RPE. Fine-tune the base kcal/min slider within the zone range to best reflect actual effort.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Apply Modifiers</h4>
+            <p>Select intensity multipliers for terrain, grip, movement quality, and psychological load. Add efficiency bonuses for flow or open-hand use. Modifiers stack automatically.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Read the Output</h4>
+            <p>The result panel shows kcal/min rate and total energy cost for the session, plus the full calculation breakdown for transparency.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h4>Log to Session</h4>
+            <p>Tap <strong>＋ LOG TO SESSION</strong> to record the burn. Switch to the Session Log tab to review all burns, session totals, recovery quality, HRR₆₀ data, and notes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NUTRITION ── -->
+    <div class="section">
+      <div class="section-label">Application</div>
+      <div class="section-heading">NUTRITION &amp; <span>PERFORMANCE STRATEGY</span></div>
+      <p>
+        Understanding energy expenditure relative to CP allows for more precise
+        fuelling and recovery planning:
+      </p>
+      <div class="callout callout-red" style="background:#fef2f2;border-left:4px solid var(--red);">
+        <div class="callout-title" style="color:var(--red);">Above CP (Short Bursts)</div>
+        <p>High-intensity crux segments above CP rely heavily on glycogen and phosphocreatine.
+        Prioritise fast-access carbohydrates before and between attempts.</p>
+      </div>
+      <div class="callout callout-blue">
+        <div class="callout-title">Near CP (Sustained Effort)</div>
+        <p>Longer routes at or near CP benefit from sustained carbohydrate availability,
+        supplemented by fats for extended sessions. Hydration is critical.</p>
+      </div>
+      <div class="callout callout-lime">
+        <div class="callout-title">Training Adaptation</div>
+        <p>Practising at or near CP builds aerobic endurance. Tracking energy cost over time
+        reveals efficiency gains — the same route at lower kcal/min indicates improved
+        movement economy and fitness.</p>
+      </div>
+    </div>
+
+    <!-- ── LIMITATIONS ── -->
+    <div class="section">
+      <div class="section-label">Important</div>
+      <div class="section-heading">LIMITATIONS &amp; <span>BEST USE</span></div>
+      <p>
+        The PranaClimb calculator is a <strong>field estimation tool</strong>, not a
+        clinical metabolic measurement. It is best used to track <em>relative change</em> —
+        how your energy cost shifts as fitness, technique, and route familiarity evolve.
+      </p>
+      <div class="callout callout-pink">
+        <div class="callout-title">What it is not</div>
+        <p>It is not a precise calorie counter. Individual metabolic rate, body composition,
+        altitude, temperature, and many other factors affect true expenditure in ways this
+        tool does not model. Do not use it to guide clinical nutrition or medical decisions.</p>
+      </div>
+      <p>
+        For best results: use consistent measurement conditions, log multiple sessions,
+        and look for trends over weeks rather than single-session absolute numbers.
+        The HRR₆₀ field (heart rate recovery in 60 seconds) provides an additional
+        proxy for overall session intensity and recovery quality.
+      </p>
+    </div>
+
+  </div><!-- end .page -->
+
+  <!-- FOOTER -->
+  <div class="disclaimer">
+    <div class="disclaimer-inner">
+      <p>Not a medical calorie counter — a climbing-specific metabolic proxy.</p>
+      <p>Best used to track <em>relative change</em> in energy cost, pacing &amp; efficiency over time.</p>
+      <div class="copy">
+        PRANACLIMB ENERGY-COST CALCULATOR · v1.0 · INFO GUIDE<br />
+        © PRANACLIMB LTD. ALL RIGHTS RESERVED.
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

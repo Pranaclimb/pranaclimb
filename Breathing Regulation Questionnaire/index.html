@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranaclimb - Breathing & Climbing Regulation Questionnaire</title>
+    
+    <!-- React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const ChevronDown = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        );
+
+        const ChevronUp = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+        );
+
+        const PranaclimbApp = () => {
+            const [responses, setResponses] = useState(Array(18).fill(null));
+            const [showResults, setShowResults] = useState(false);
+            const [expandedSections, setExpandedSections] = useState({
+                mechanical: false,
+                stress: false,
+                power: false
+            });
+
+            const questions = [
+                "I hold my breath during hard moves or clipping",
+                "I lose rhythm with my breathing when pumped",
+                "My breathing becomes shallow in stressful sections",
+                "I over-breathe or gasp when anxious/falling",
+                "I struggle to inhale deeply mid-route",
+                "I exhale sharply (grunt/scream) without control",
+                "I feel tightness in chest/diaphragm while climbing",
+                "I breathe too fast early in the climb",
+                "I get dizzy/lightheaded on intense routes",
+                "I panic or lose composure when pumped",
+                "I struggle to calm my breathing at rests",
+                "I can't return to nasal breathing after effort",
+                "My fingers/toes tingle when overgripping or pumped",
+                "I feel disconnected from breathing when climbing",
+                "I find it hard to stay mentally calm on lead",
+                "My breathing feels loud, stressed or erratic",
+                "I hyperventilate after falling or on the redpoint go",
+                "I struggle to breathe with tension in core/abdomen"
+            ];
+
+            const labels = ["Never", "Seldom", "Sometimes", "Often", "Very Often"];
+            
+            const categories = {
+                mechanical: [0, 1, 2, 4, 6, 7, 15],
+                stress: [3, 8, 9, 13, 14, 16],
+                power: [5, 10, 11, 17]
+            };
+
+            const totalScore = responses.reduce((sum, val) => sum + (val || 0), 0);
+            const isComplete = responses.every(val => val !== null);
+
+            const getScoreData = () => {
+                const mechanicalScore = categories.mechanical.reduce((sum, i) => sum + (responses[i] || 0), 0);
+                const stressScore = categories.stress.reduce((sum, i) => sum + (responses[i] || 0), 0);
+                const powerScore = categories.power.reduce((sum, i) => sum + (responses[i] || 0), 0);
+
+                let zone, zoneColor, zoneEmoji, interpretation, priority;
+                
+                if (totalScore <= 20) {
+                    zone = "GREEN – Functional & Efficient";
+                    zoneColor = "bg-green-500";
+                    zoneEmoji = "🟢";
+                    interpretation = "Functional & efficient breathing - you have good breath control";
+                    priority = "Maintain good habits, continue monitoring";
+                } else if (totalScore <= 40) {
+                    zone = "YELLOW – Improvable";
+                    zoneColor = "bg-yellow-500";
+                    zoneEmoji = "🟡";
+                    interpretation = "Moderate dysregulation present - breathing is improvable";
+                    priority = "Focus on breathing awareness and control techniques";
+                } else {
+                    zone = "RED – Significant Dysregulation";
+                    zoneColor = "bg-red-500";
+                    zoneEmoji = "🔴";
+                    interpretation = "Significant breathing dysregulation / anxiety response present";
+                    priority = "Foundation breathwork, control under load, CO₂ tolerance training";
+                }
+
+                return {
+                    totalScore,
+                    mechanicalScore,
+                    stressScore,
+                    powerScore,
+                    zone,
+                    zoneColor,
+                    zoneEmoji,
+                    interpretation,
+                    priority
+                };
+            };
+
+            const getRecommendations = () => {
+                const data = getScoreData();
+                const highestCategory = 
+                    data.mechanicalScore >= data.stressScore && data.mechanicalScore >= data.powerScore ? 'mechanical' :
+                    data.stressScore >= data.powerScore ? 'stress' : 'power';
+
+                let recommendations = [];
+
+                if (totalScore <= 20) {
+                    // GREEN ZONE - Maintain good practices
+                    recommendations = [
+                        { title: "Continue monitoring", detail: "Track changes over time" },
+                        { title: "Maintain awareness", detail: "Stay conscious of breathing patterns" },
+                        { title: "Pre-climb breathing prep", detail: "Light warm-up routines" },
+                        { title: "Periodic check-ins", detail: "Reassess every 4-6 weeks" }
+                    ];
+                } else if (totalScore <= 40) {
+                    // YELLOW ZONE - Build awareness and control
+                    recommendations = [
+                        { title: "Nasal breathing warm-ups", detail: "3–5 min before climbing" },
+                        { title: "4:8 extended exhales", detail: "4s inhale / 8s exhale practice" },
+                        { title: "Recovery breath timing", detail: "HRR60 tracking" },
+                        { title: "Breathing awareness drills", detail: "Focus during easy routes" }
+                    ];
+                } else {
+                    // RED ZONE - Foundation work needed
+                    recommendations = [
+                        { title: "Foundation breathwork", detail: "Daily practice essential" },
+                        { title: "4:8 extended exhales", detail: "Calm nervous system" },
+                        { title: "Apnea walking", detail: "Build CO₂ tolerance 2–3×/week" },
+                        { title: "Shield Breath + Micro-Exhale", detail: "Practice during climbing" },
+                        { title: "Threshold breathing intervals", detail: "CP ≈ 45 BPM" },
+                        { title: "Professional support", detail: "Consider breathing coach/therapist" }
+                    ];
+                }
+
+                // Add specific pattern recommendations
+                if (highestCategory === 'mechanical') {
+                    recommendations.push({
+                        title: "🫁 Mechanic Pattern Focus",
+                        detail: "Shield Breath • Micro-Exhales • Reduce Valsalva duration"
+                    });
+                } else if (highestCategory === 'stress') {
+                    recommendations.push({
+                        title: "⚡ Stress Response Focus",
+                        detail: "Grounding Breath • Extended Exhale 4:8 • Eyes-soft reset"
+                    });
+                } else {
+                    recommendations.push({
+                        title: "🔥 Power Expression Focus",
+                        detail: "Rowing Breath • HRR Reset • Breath-movement coupling"
+                    });
+                }
+
+                return recommendations;
+            };
+
+            const handleResponse = (questionIndex, value) => {
+                const newResponses = [...responses];
+                newResponses[questionIndex] = value;
+                setResponses(newResponses);
+            };
+
+            const handleSubmit = () => {
+                if (isComplete) {
+                    setShowResults(true);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            const handleReset = () => {
+                setResponses(Array(18).fill(null));
+                setShowResults(false);
+            };
+
+            const toggleSection = (section) => {
+                setExpandedSections(prev => ({
+                    ...prev,
+                    [section]: !prev[section]
+                }));
+            };
+
+            const scoreData = isComplete ? getScoreData() : null;
+            const recommendations = isComplete ? getRecommendations() : null;
+
+            return (
+                <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#ffffff' }}>
+                    <div className="max-w-4xl mx-auto">
+                        {/* Header */}
+                        <div className="mb-8 p-6 rounded-lg" style={{ 
+                            borderWidth: '3px', 
+                            borderStyle: 'solid',
+                            borderColor: '#ff00ff',
+                            background: 'linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%)'
+                        }}>
+                            <h1 className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ff00ff' }}>
+                                🫁 Pranaclimb
+                            </h1>
+                            <p className="text-xl" style={{ color: '#89cff0' }}>
+                                Breathing & Climbing Regulation Questionnaire
+                            </p>
+                            <p className="mt-2 text-gray-600">
+                                Rate how often each occurs while climbing or preparing to climb
+                            </p>
+                        </div>
+
+                        {/* Results Display */}
+                        {showResults && scoreData && (
+                            <div className="mb-8 space-y-4 animate-fadeIn">
+                                {/* Score Summary */}
+                                <div className="p-6 rounded-lg shadow-lg" style={{ 
+                                    borderWidth: '2px',
+                                    borderColor: '#aaff00',
+                                    backgroundColor: '#f9f9f9'
+                                }}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-3xl font-bold" style={{ color: '#ff00ff' }}>
+                                            Your Results
+                                        </h2>
+                                        <button
+                                            onClick={handleReset}
+                                            className="px-4 py-2 rounded-lg font-medium transition-all hover:scale-105"
+                                            style={{ backgroundColor: '#aaff00', color: '#000' }}
+                                        >
+                                            Retake Assessment
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #89cff0' }}>
+                                            <p className="text-sm text-gray-600 mb-1">Total Score</p>
+                                            <p className="text-4xl font-bold" style={{ color: '#ff00ff' }}>
+                                                {scoreData.totalScore} / 72
+                                            </p>
+                                        </div>
+                                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #89cff0' }}>
+                                            <p className="text-sm text-gray-600 mb-1">Zone</p>
+                                            <p className="text-2xl font-bold flex items-center gap-2" style={{ color: '#ff00ff' }}>
+                                                {scoreData.zoneEmoji} {scoreData.zone.split('–')[0]}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 rounded-lg mb-4" style={{ backgroundColor: '#aaff00', opacity: 0.9 }}>
+                                        <p className="font-semibold mb-2">Interpretation:</p>
+                                        <p className="text-gray-800">{scoreData.interpretation}</p>
+                                    </div>
+
+                                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#89cff0', opacity: 0.3 }}>
+                                        <p className="font-semibold mb-2" style={{ color: '#000' }}>Coaching Priority:</p>
+                                        <p className="text-gray-800">{scoreData.priority}</p>
+                                    </div>
+                                </div>
+
+                                {/* Category Breakdown */}
+                                <div className="p-6 rounded-lg shadow-lg" style={{ 
+                                    borderWidth: '2px',
+                                    borderColor: '#ff00ff',
+                                    backgroundColor: '#f9f9f9'
+                                }}>
+                                    <h3 className="text-2xl font-bold mb-4" style={{ color: '#ff00ff' }}>
+                                        Pattern Breakdown
+                                    </h3>
+                                    
+                                    <div className="space-y-3">
+                                        <div className="p-4 rounded-lg cursor-pointer transition-all hover:shadow-md" 
+                                            style={{ backgroundColor: '#ffffff', border: '2px solid #89cff0' }}
+                                            onClick={() => toggleSection('mechanical')}>
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex-1">
+                                                    <p className="font-semibold">🫁 Mechanical / Pattern</p>
+                                                    <p className="text-sm text-gray-600">Skill-based breathing efficiency</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl font-bold" style={{ color: '#ff00ff' }}>
+                                                        {scoreData.mechanicalScore} / 28
+                                                    </span>
+                                                    {expandedSections.mechanical ? <ChevronUp /> : <ChevronDown />}
+                                                </div>
+                                            </div>
+                                            {expandedSections.mechanical && (
+                                                <div className="mt-3 pt-3 border-t border-gray-200">
+                                                    <p className="text-sm text-gray-700">
+                                                        Focus: Shield Breath • Micro-Exhales • Reduce Valsalva duration
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-4 rounded-lg cursor-pointer transition-all hover:shadow-md" 
+                                            style={{ backgroundColor: '#ffffff', border: '2px solid #aaff00' }}
+                                            onClick={() => toggleSection('stress')}>
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex-1">
+                                                    <p className="font-semibold">⚡ Stress / CO₂ Response</p>
+                                                    <p className="text-sm text-gray-600">Emotional + ventilatory threat response</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl font-bold" style={{ color: '#ff00ff' }}>
+                                                        {scoreData.stressScore} / 24
+                                                    </span>
+                                                    {expandedSections.stress ? <ChevronUp /> : <ChevronDown />}
+                                                </div>
+                                            </div>
+                                            {expandedSections.stress && (
+                                                <div className="mt-3 pt-3 border-t border-gray-200">
+                                                    <p className="text-sm text-gray-700">
+                                                        Focus: Grounding Breath • Extended Exhale 4:8 • Eyes-soft reset
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-4 rounded-lg cursor-pointer transition-all hover:shadow-md" 
+                                            style={{ backgroundColor: '#ffffff', border: '2px solid #ff00ff' }}
+                                            onClick={() => toggleSection('power')}>
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex-1">
+                                                    <p className="font-semibold">🔥 Power / Expression</p>
+                                                    <p className="text-sm text-gray-600">Redline breathing control + exhale coupling</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl font-bold" style={{ color: '#ff00ff' }}>
+                                                        {scoreData.powerScore} / 20
+                                                    </span>
+                                                    {expandedSections.power ? <ChevronUp /> : <ChevronDown />}
+                                                </div>
+                                            </div>
+                                            {expandedSections.power && (
+                                                <div className="mt-3 pt-3 border-t border-gray-200">
+                                                    <p className="text-sm text-gray-700">
+                                                        Focus: Rowing Breath • HRR Reset • Breath-movement coupling
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Recommendations */}
+                                <div className="p-6 rounded-lg shadow-lg" style={{ 
+                                    borderWidth: '2px',
+                                    borderColor: '#aaff00',
+                                    backgroundColor: '#f9f9f9'
+                                }}>
+                                    <h3 className="text-2xl font-bold mb-4" style={{ color: '#ff00ff' }}>
+                                        📋 Your Training Program
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        {recommendations.map((rec, idx) => (
+                                            <div key={idx} className="p-4 rounded-lg transition-all hover:shadow-md" 
+                                                style={{ backgroundColor: '#ffffff', border: '2px solid #89cff0' }}>
+                                                <p className="font-semibold mb-1" style={{ color: '#ff00ff' }}>
+                                                    {rec.title}
+                                                </p>
+                                                <p className="text-sm text-gray-600">{rec.detail}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Questionnaire */}
+                        {!showResults && (
+                            <div className="space-y-4">
+                                {questions.map((question, qIndex) => (
+                                    <div key={qIndex} className="p-5 rounded-lg shadow-md transition-all hover:shadow-lg" 
+                                        style={{ 
+                                            backgroundColor: '#ffffff',
+                                            borderWidth: '2px',
+                                            borderColor: responses[qIndex] !== null ? '#aaff00' : '#89cff0'
+                                        }}>
+                                        <p className="font-medium mb-4 text-gray-800">
+                                            <span className="font-bold" style={{ color: '#ff00ff' }}>
+                                                {qIndex + 1}.
+                                            </span> {question}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[0, 1, 2, 3, 4].map((value) => (
+                                                <button
+                                                    key={value}
+                                                    onClick={() => handleResponse(qIndex, value)}
+                                                    className="flex-1 min-w-[80px] px-4 py-3 rounded-lg font-medium transition-all hover:scale-105"
+                                                    style={{
+                                                        backgroundColor: responses[qIndex] === value ? '#ff00ff' : '#f0f0f0',
+                                                        color: responses[qIndex] === value ? '#ffffff' : '#000',
+                                                        border: responses[qIndex] === value ? '2px solid #aaff00' : '2px solid #ddd'
+                                                    }}
+                                                >
+                                                    <div className="text-sm font-bold">{value}</div>
+                                                    <div className="text-xs">{labels[value]}</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* Submit Button */}
+                                <div className="sticky bottom-4 pt-4">
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={!isComplete}
+                                        className="w-full py-4 rounded-lg font-bold text-xl transition-all shadow-lg"
+                                        style={{
+                                            backgroundColor: isComplete ? '#aaff00' : '#e0e0e0',
+                                            color: '#000',
+                                            cursor: isComplete ? 'pointer' : 'not-allowed',
+                                            opacity: isComplete ? 1 : 0.5,
+                                            border: '3px solid #ff00ff'
+                                        }}
+                                    >
+                                        {isComplete ? '🎯 View My Results' : `${responses.filter(r => r !== null).length}/18 Questions Completed`}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="mt-8 text-center text-sm text-gray-500">
+                            <p>Adapted from Nijmegen Questionnaire</p>
+                            <p className="mt-1">Pranaclimb Methodology © 2025</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PranaclimbApp />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ocean Breathes - Every 5th Breath</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(180deg, #001a33 0%, #004466 50%, #006699 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ocean-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .phytoplankton {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffaa;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffaa;
+            animation: float 15s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { opacity: 0; transform: translateY(100vh) translateX(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-20vh) translateX(var(--drift)); }
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #00ffaa 0%, #00ccff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 170, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 50px;
+            color: #00ffaa;
+            font-style: italic;
+        }
+
+        .breath-counter {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 60px;
+            border-radius: 30px;
+            border: 3px solid rgba(0, 255, 170, 0.3);
+            margin-bottom: 60px;
+        }
+
+        .counter-display {
+            font-size: 8rem;
+            font-weight: bold;
+            color: #00ffaa;
+            text-shadow: 0 0 30px rgba(0, 255, 170, 0.8);
+            animation: breathPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes breathPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .counter-label {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #00ccff;
+        }
+
+        .highlight {
+            background: rgba(0, 255, 170, 0.2);
+            padding: 5px 10px;
+            border-radius: 8px;
+            color: #00ffaa;
+            font-weight: bold;
+        }
+
+        .timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .timeline-item {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            margin-bottom: 40px;
+            border-radius: 20px;
+            border-left: 5px solid #00ffaa;
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            border-left-color: #00ccff;
+        }
+
+        .timeline-year {
+            font-size: 2.5rem;
+            color: #00ffaa;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #00ccff;
+        }
+
+        .timeline-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #b3e0ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 170, 0.3);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: #00ffaa;
+            box-shadow: 0 10px 40px rgba(0, 255, 170, 0.3);
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #00ffaa;
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            font-size: 1.3rem;
+            color: #00ccff;
+            line-height: 1.6;
+        }
+
+        .quote-section {
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 3px solid rgba(0, 255, 170, 0.3);
+            text-align: center;
+        }
+
+        .quote-text {
+            font-size: 1.8rem;
+            font-style: italic;
+            line-height: 1.8;
+            color: #00ccff;
+            margin-bottom: 30px;
+        }
+
+        .quote-author {
+            font-size: 1.3rem;
+            color: #00ffaa;
+            font-weight: bold;
+        }
+
+        .atmosphere-viz {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+        }
+
+        .gas-bar {
+            margin: 20px 0;
+        }
+
+        .gas-label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #00ccff;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: width 2s ease;
+        }
+
+        .nitrogen-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .oxygen-bar {
+            background: linear-gradient(90deg, #00ffaa 0%, #00ccff 100%);
+        }
+
+        .other-bar {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffd93d 100%);
+        }
+
+        .cycle-diagram {
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        .cycle-title {
+            font-size: 2.5rem;
+            color: #00ffaa;
+            margin-bottom: 50px;
+        }
+
+        .cycle-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 1.5rem;
+        }
+
+        .cycle-element {
+            background: rgba(0, 255, 170, 0.2);
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: 2px solid #00ffaa;
+        }
+
+        .cycle-arrow {
+            font-size: 3rem;
+            color: #00ccff;
+            animation: arrowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.5rem;
+            color: #00ffaa;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .subtitle { font-size: 1.3rem; }
+            .counter-display { font-size: 5rem; }
+            .breath-counter { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ocean-particles" id="oceanParticles"></div>
+
+    <div class="hero">
+        <h1>🌊 The Ocean Breathes</h1>
+        <p class="subtitle">Every 5th Breath Comes From The Sea</p>
+        
+        <div class="breath-counter">
+            <div class="counter-display" id="breathCounter">1</div>
+            <div class="counter-label">Breaths from Phytoplankton</div>
+        </div>
+
+        <p style="font-size: 1.3rem; max-width: 700px; line-height: 1.8;">
+            Right now, as you breathe, tiny organisms called <span class="highlight">Prochlorococcus</span> 
+            are producing the oxygen for <span class="highlight">one in every five breaths</span> you take.
+        </p>
+    </div>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-year">2.5 Billion Years Ago</div>
+            <div class="timeline-title">The Most Important Evolutionary Leap</div>
+            <div class="timeline-text">
+                Bluish-green cyanobacteria emerged in the Archaean ocean and transformed Earth's atmosphere. 
+                This was the beginning of <strong style="color: #00ffaa;">photosynthesis</strong>. 
+                These tiny organisms absorbed light from the sun and used it to make sugars from carbon dioxide 
+                and water. The waste produced was <strong style="color: #00ffaa;">oxygen</strong> — and life began to evolve on Earth.
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-year">Today</div>
+            <div class="timeline-title">Prochlorococcus: Earth's Smallest Oxygen Factory</div>
+            <div class="timeline-text">
+                <strong style="color: #00ffaa;">Prochlorococcus</strong> is the smallest photosynthetic organism on Earth. 
+                But this little bacteria produces up to <strong style="color: #00ffaa;">20% of the oxygen</strong> 
+                in our entire biosphere. Every fifth breath you take — thank phytoplankton.
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">50-80%</div>
+            <div class="stat-label">of Earth's oxygen comes from ocean phytoplankton</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">1 in 5</div>
+            <div class="stat-label">breaths provided by Prochlorococcus alone</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">78%</div>
+            <div class="stat-label">Nitrogen in Earth's atmosphere</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">21%</div>
+            <div class="stat-label">Oxygen in Earth's atmosphere</div>
+        </div>
+    </div>
+
+    <div class="atmosphere-viz">
+        <h2 style="text-align: center; font-size: 2rem; color: #00ffaa; margin-bottom: 40px;">
+            Earth's Atmosphere Composition
+        </h2>
+        
+        <div class="gas-bar">
+            <div class="gas-label">Nitrogen (N₂) - 78%</div>
+            <div class="bar-container">
+                <div class="bar-fill nitrogen-bar" style="width: 78%;">78%</div>
+            </div>
+        </div>
+
+        <div class="gas-bar">
+            <div class="gas-label">Oxygen (O₂) - 21%</div>
+            <div class="bar-container">
+                <div class="bar-fill oxygen-bar" style="width: 21%;">21%</div>
+            </div>
+        </div>
+
+        <div class="gas-bar">
+            <div class="gas-label">Other Gases (CO₂, Neon, Hydrogen) - 1%</div>
+            <div class="bar-container">
+                <div class="bar-fill other-bar" style="width: 1%;">1%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cycle-diagram">
+        <h2 class="cycle-title">The Breath Cycle</h2>
+        <div class="cycle-flow">
+            <div class="cycle-element">☀️ Sunlight</div>
+            <span class="cycle-arrow">→</span>
+            <div class="cycle-element">🦠 Phytoplankton</div>
+            <span class="cycle-arrow">→</span>
+            <div class="cycle-element">O₂ Oxygen</div>
+            <span class="cycle-arrow">→</span>
+            <div class="cycle-element">🫁 We Breathe</div>
+            <span class="cycle-arrow">→</span>
+            <div class="cycle-element">CO₂ Released</div>
+            <span class="cycle-arrow">→</span>
+            <div class="cycle-element">🌊 Ocean</div>
+            <span class="cycle-arrow">↻</span>
+        </div>
+    </div>
+
+    <div class="quote-section">
+        <div class="quote-text">
+            "Breathing in through our nose we feel the cool air (oxygen) hit the back of our throat. 
+            Breathing out we release warm air (carbon dioxide) back into the atmosphere for trees, 
+            plants and phytoplankton to recycle."
+        </div>
+        <div style="font-size: 1.5rem; color: #00ffaa; margin: 30px 0;">
+            <strong>This is the rhythm of life and energy.</strong>
+        </div>
+        <div class="quote-text">
+            "We are all connected. We breathe plants and plants breathe us."
+        </div>
+    </div>
+
+    <div class="quote-section">
+        <div class="quote-text">
+            "Prochlorococcus provides the oxygen for one in every five breaths we take."
+        </div>
+        <div class="quote-author">— Dr. Sylvia Earle, National Geographic Explorer</div>
+    </div>
+
+    <div class="footer">
+        <p>🌊 We are the ocean. The ocean is us. 🌊</p>
+        <p style="margin-top: 20px; font-size: 1.2rem;">Every breath connects us to 2.5 billion years of evolution.</p>
+    </div>
+
+    <script>
+        // Create floating phytoplankton particles
+        function createPhytoplankton() {
+            const container = document.getElementById('oceanParticles');
+            const particle = document.createElement('div');
+            particle.className = 'phytoplankton';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.setProperty('--drift', (Math.random() * 200 - 100) + 'px');
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            container.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 20000);
+        }
+
+        // Create particles continuously
+        setInterval(createPhytoplankton, 300);
+
+        // Breath counter animation
+        let breathCount = 0;
+        setInterval(() => {
+            breathCount++;
+            const counter = document.getElementById('breathCounter');
+            counter.textContent = breathCount;
+            
+            // Highlight every 5th breath
+            if (breathCount % 5 === 0) {
+                counter.style.color = '#ffaa00';
+                counter.style.textShadow = '0 0 50px #ffaa00';
+                setTimeout(() => {
+                    counter.style.color = '#00ffaa';
+                    counter.style.textShadow = '0 0 30px rgba(0, 255, 170, 0.8)';
+                }, 500);
+            }
+        }, 4000); // Every 4 seconds (average breath)
+    </script>
+</body>
+</html>

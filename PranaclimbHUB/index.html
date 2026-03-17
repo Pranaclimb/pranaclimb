@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranaclimb - App Hub</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', system-ui, sans-serif;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function PranaclimbHub() {
+            const [hoveredCard, setHoveredCard] = useState(null);
+
+            const apps = [
+                {
+                    id: 1,
+                    title: 'RPE Scale',
+                    description: 'Track your Rate of Perceived Exertion with precision',
+                    url: 'https://pranaclimb.github.io/Pranaclimb-RPE-Scale/',
+                    icon: 'TrendingUp',
+                    color: '#87CEEB',
+                    gradient: 'from-[#87CEEB] to-[#6BB6D8]'
+                },
+                {
+                    id: 2,
+                    title: 'Live RPE Tracker',
+                    description: 'Real-time exertion monitoring and analysis',
+                    url: 'https://pranaclimb.github.io/Pranaclimb-Live-RPE/',
+                    icon: 'Activity',
+                    color: '#FF00FC',
+                    gradient: 'from-[#FF00FC] to-[#E600E3]'
+                },
+                {
+                    id: 3,
+                    title: 'Breathing Regulation',
+                    description: 'Master your breath, master your climb',
+                    url: 'https://pranaclimb.github.io/Pranaclimb-Breathing-Regulation/',
+                    icon: 'Wind',
+                    color: '#32CD32',
+                    gradient: 'from-[#32CD32] to-[#28B828]'
+                },
+                {
+                    id: 4,
+                    title: 'Recovery Breath Ladder',
+                    description: 'Progressive breathing exercises for optimal recovery',
+                    url: 'https://pranaclimb.github.io/Recovery-Breath-Ladder/',
+                    icon: 'Layers',
+                    color: '#87CEEB',
+                    gradient: 'from-[#87CEEB] to-[#6BB6D8]'
+                },
+                {
+                    id: 5,
+                    title: '12 Cues',
+                    description: 'Essential climbing cues for peak performance',
+                    url: 'https://pranaclimb.github.io/12-cues/',
+                    icon: 'Target',
+                    color: '#FF00FC',
+                    gradient: 'from-[#FF00FC] to-[#E600E3]'
+                }
+            ];
+
+            // Icon component wrapper
+            const Icon = ({ name, ...props }) => {
+                React.useEffect(() => {
+                    lucide.createIcons();
+                }, []);
+                
+                return React.createElement('i', {
+                    'data-lucide': name.toLowerCase().replace(/([A-Z])/g, '-$1').toLowerCase().slice(1),
+                    ...props
+                });
+            };
+
+            return (
+                <div className="min-h-screen bg-white relative overflow-hidden">
+                    {/* Animated background elements */}
+                    <div className="absolute inset-0 opacity-20">
+                        <div className="absolute top-20 left-20 w-96 h-96 rounded-full filter blur-3xl animate-pulse" 
+                             style={{ backgroundColor: '#87CEEB', animationDuration: '8s' }} />
+                        <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full filter blur-3xl animate-pulse" 
+                             style={{ backgroundColor: '#FF00FC', animationDuration: '10s', animationDelay: '2s' }} />
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full filter blur-3xl animate-pulse" 
+                             style={{ backgroundColor: '#32CD32', animationDuration: '12s', animationDelay: '4s' }} />
+                    </div>
+
+                    {/* Breathing animation overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+                            <div className="w-4 h-4 rounded-full opacity-10 animate-ping" 
+                                 style={{ backgroundColor: '#FF00FC', animationDuration: '4s' }} />
+                        </div>
+                    </div>
+
+                    <div className="relative z-10 container mx-auto px-6 py-16">
+                        {/* Header */}
+                        <header className="text-center mb-20 animate-fade-in">
+                            <h1 className="text-7xl font-bold mb-6 tracking-tight" 
+                                style={{ fontFamily: 'Poppins, system-ui, sans-serif', color: '#FF00FC' }}>
+                                Pranaclimb
+                            </h1>
+                            <p className="text-2xl font-light tracking-wide" 
+                               style={{ fontFamily: 'Poppins, system-ui, sans-serif', color: '#333' }}>
+                                Elevate your climbing through breath and awareness
+                            </p>
+                            <div className="mt-8 w-24 h-1 mx-auto rounded-full" 
+                                 style={{ background: 'linear-gradient(to right, #87CEEB, #FF00FC, #32CD32)' }} />
+                        </header>
+
+                        {/* Apps Grid */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                            {apps.map((app, index) => {
+                                const isHovered = hoveredCard === app.id;
+                                
+                                return (
+                                    <a
+                                        key={app.id}
+                                        href={app.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onMouseEnter={() => setHoveredCard(app.id)}
+                                        onMouseLeave={() => setHoveredCard(null)}
+                                        className="group relative bg-white border-2 rounded-2xl p-8 transition-all duration-500 hover:shadow-2xl hover:scale-105"
+                                        style={{
+                                            animation: `slideUp 0.6s ease-out ${index * 0.1}s both`,
+                                            transformOrigin: 'center',
+                                            borderColor: isHovered ? app.color : '#e5e7eb'
+                                        }}
+                                    >
+                                        {/* Gradient overlay on hover */}
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${app.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-500`} />
+                                        
+                                        {/* Content */}
+                                        <div className="relative z-10">
+                                            <div className="flex items-start justify-between mb-6">
+                                                <div className="p-4 rounded-xl transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110"
+                                                     style={{ backgroundColor: app.color }}>
+                                                    <Icon name={app.icon} className="w-8 h-8 text-white" strokeWidth={2} />
+                                                </div>
+                                                <Icon name="ExternalLink" 
+                                                      className="w-5 h-5 transition-all duration-300"
+                                                      style={{ color: isHovered ? app.color : '#9ca3af' }} />
+                                            </div>
+                                            
+                                            <h3 className="text-2xl font-bold mb-3" 
+                                                style={{ fontFamily: 'Poppins, system-ui, sans-serif', color: '#1f2937' }}>
+                                                {app.title}
+                                            </h3>
+                                            
+                                            <p className="leading-relaxed" 
+                                               style={{ fontFamily: 'Poppins, system-ui, sans-serif', color: '#6b7280' }}>
+                                                {app.description}
+                                            </p>
+
+                                            {/* Animated underline */}
+                                            <div className={`mt-6 h-0.5 bg-gradient-to-r ${app.gradient} rounded-full transition-all duration-500 ${
+                                                isHovered ? 'w-full' : 'w-0'
+                                            }`} />
+                                        </div>
+
+                                        {/* Corner accent */}
+                                        <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${app.gradient} opacity-0 group-hover:opacity-20 rounded-2xl transition-opacity duration-500 blur-xl`} />
+                                    </a>
+                                );
+                            })}
+                        </div>
+
+                        {/* Footer */}
+                        <footer className="text-center mt-20" 
+                                style={{ animation: 'fadeIn 1s ease-out 0.8s both', color: '#9ca3af' }}>
+                            <p className="text-sm" style={{ fontFamily: 'Poppins, system-ui, sans-serif' }}>
+                                Breathe deep. Climb higher. Train smarter.
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PranaclimbHub />);
+    </script>
+</body>
+</html>

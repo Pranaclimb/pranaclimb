@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐡 Pufferfish Breath</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .animation-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .pufferfish-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 30px 0;
+        }
+
+        .pufferfish {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .pufferfish.inhale {
+            transform: scale(1.4);
+        }
+
+        .pufferfish.hold {
+            transform: scale(1.4);
+        }
+
+        .pufferfish.exhale {
+            transform: scale(1);
+        }
+
+        .pufferfish::before {
+            content: '🐡';
+            position: absolute;
+            font-size: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .breath-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(79, 172, 254, 0.3);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .ring.active {
+            animation: ripple 3s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                width: 100%;
+                height: 100%;
+                opacity: 1;
+            }
+            100% {
+                width: 300%;
+                height: 300%;
+                opacity: 0;
+            }
+        }
+
+        .phase-indicator {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 40px;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .steps-card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .step {
+            margin-bottom: 25px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .benefit-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .benefit-item h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .benefit-item p {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .zone-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐡 Pufferfish Breath</h1>
+            <p class="subtitle">Reset Breath for Post-Crux Recovery</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Animation Section -->
+            <div class="card animation-card">
+                <span class="zone-badge">Expressive Efficiency / CO₂ Rebalance</span>
+                
+                <div class="pufferfish-container">
+                    <div class="breath-rings" id="breathRings"></div>
+                    <div class="pufferfish" id="pufferfish"></div>
+                </div>
+
+                <div class="phase-indicator" id="phaseText">Click Start to Begin</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+
+                <button class="control-btn" id="startBtn" onclick="toggleBreathing()">Start Breathing</button>
+            </div>
+
+            <!-- Steps Section -->
+            <div class="card steps-card">
+                <h2>How to Do It</h2>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Soft Nasal Inhale</h3>
+                    <p>Breathe in gently through your nose. No tension—just enough air to lightly puff your cheeks like a pufferfish.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Brief Hold (0.5–1 sec)</h3>
+                    <p>Gentle pressurization with puffed cheeks. Never strain. This is a soft reset, not a power breath.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Slow Controlled Exhale</h3>
+                    <p>Let your cheeks deflate naturally. Lips relaxed, long sigh-like release through the mouth.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Repeat 1–3 Times</h3>
+                    <p>Do NOT hyperventilate. This is a reset breath, not a pump. Use after cruxes to normalize your system.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="card">
+            <h2 style="color: #667eea; margin-bottom: 20px; font-size: 1.8rem;">Why It Works</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <h3>🧘 Reduces Tension</h3>
+                    <p>Drops sympathetic nervous system activation immediately after hard moves</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>💨 Breathing Reset</h3>
+                    <p>Quickly lowers breathing rate after spikes from grunts or breath holds</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>😤 Releases Jaw Grip</h3>
+                    <p>Dissolves facial and jaw tension common during overgripping</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>👃 Nasal Return</h3>
+                    <p>Switches you back toward efficient nasal breathing patterns</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🫁 CO₂ Balance</h3>
+                    <p>Normalizes CO₂ levels after expressive breaths (screams/grunts/BHs)</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>⚡ W'bal Recovery</h3>
+                    <p>Accelerates HRR₆₀ and anaerobic work capacity restoration</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🌀 Prevents Spirals</h3>
+                    <p>Stops "overbreathing spirals" that can occur post-crux</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🎯 Fast Reset</h3>
+                    <p>Optimizes heart rate recovery for next sequence</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isBreathing = false;
+        let breathInterval;
+        let currentCycle = 0;
+
+        const phases = [
+            { name: 'Inhale softly...', duration: 2000, class: 'inhale' },
+            { name: 'Hold gently (0.5-1s)...', duration: 1000, class: 'hold' },
+            { name: 'Exhale slowly...', duration: 6000, class: 'exhale' },
+            { name: 'Rest...', duration: 1000, class: '' }
+        ];
+
+        function toggleBreathing() {
+            const btn = document.getElementById('startBtn');
+            const pufferfish = document.getElementById('pufferfish');
+            
+            if (!isBreathing) {
+                isBreathing = true;
+                btn.textContent = 'Stop';
+                currentCycle = 0;
+                runBreathCycle();
+            } else {
+                isBreathing = false;
+                btn.textContent = 'Start Breathing';
+                clearTimeout(breathInterval);
+                document.getElementById('phaseText').textContent = 'Click Start to Begin';
+                pufferfish.className = 'pufferfish';
+                document.getElementById('progressBar').style.width = '0%';
+            }
+        }
+
+        function runBreathCycle() {
+            if (!isBreathing) return;
+
+            const phase = phases[currentCycle % phases.length];
+            const pufferfish = document.getElementById('pufferfish');
+            const phaseText = document.getElementById('phaseText');
+            const progressBar = document.getElementById('progressBar');
+
+            phaseText.textContent = phase.name;
+            pufferfish.className = 'pufferfish ' + phase.class;
+
+            // Create ripple effect on exhale
+            if (phase.class === 'exhale') {
+                createRipple();
+            }
+
+            // Animate progress bar
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.transition = `width ${phase.duration}ms linear`;
+                progressBar.style.width = '100%';
+            }, 50);
+
+            breathInterval = setTimeout(() => {
+                currentCycle++;
+                
+                // Complete after 3 full cycles
+                if (currentCycle >= phases.length * 3) {
+                    isBreathing = false;
+                    document.getElementById('startBtn').textContent = 'Start Breathing';
+                    phaseText.textContent = 'Complete! Feel the reset 🌟';
+                    pufferfish.className = 'pufferfish';
+                    progressBar.style.width = '0%';
+                } else {
+                    runBreathCycle();
+                }
+            }, phase.duration);
+        }
+
+        function createRipple() {
+            const container = document.getElementById('breathRings');
+            const ring = document.createElement('div');
+            ring.className = 'ring active';
+            container.appendChild(ring);
+
+            setTimeout(() => {
+                container.removeChild(ring);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

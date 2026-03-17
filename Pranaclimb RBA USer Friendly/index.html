@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pranaclimb">
+    
+    <!-- Custom Pranaclimb Logo as App Icon -->
+    <!-- Place pranaclimb-icon.png in the same directory as this HTML file -->
+    <link rel="icon" type="image/png" href="pranaclimb-icon.png">
+    <link rel="apple-touch-icon" href="pranaclimb-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="pranaclimb-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="pranaclimb-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="pranaclimb-icon.png">
+    <meta name="theme-color" content="#FF00FC">
+    
+    <title>Pranaclimb Remote Breathing Assessment</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: white;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        }
+
+        .breathing-animation {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.05); opacity: 0.35; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-shadow {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .pulse-circle {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+        }
+        
+        .animate-bounce {
+            animation: bounce 0.5s ease-in-out 2;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .animate-pulse {
+            animation: pulseSlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseSlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @supports (padding: max(0px)) {
+            body {
+                padding-top: max(env(safe-area-inset-top), 0px);
+                padding-bottom: max(env(safe-area-inset-bottom), 0px);
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Expression adjustment table (for manual marking)
+        const EXPRESSION_ADJUSTMENTS = {
+            'breath_hold': { adjustments: [2, 4, 6, 8, 10], emoji: '🔇', label: 'Breath Hold' },
+            'grunt': { adjustment: 3, emoji: '💪', label: 'Grunt' },
+            'scream': { adjustment: 5, emoji: '😱', label: 'Scream' },
+            'strong_nasal': { adjustment: 2, emoji: '👃', label: 'Strong Nasal' },
+            'yes_woo': { adjustments: [1, 2], emoji: '🎉', label: 'YES/WOO' },
+            'sigh': { adjustments: [0, -1], emoji: '😮‍💨', label: 'Sigh' },
+            'rp_latent': { adjustment: 1, emoji: '🧠', label: 'RP Latent' }
+        };
+
+        function PranaclimbApp() {
+            const [isRecording, setIsRecording] = useState(false);
+            const [audioLevel, setAudioLevel] = useState(0);
+            const [breathCount, setBreathCount] = useState(0);
+            const [rawBR, setRawBR] = useState(0);
+            const [rpe, setRpe] = useState(5);
+            const [elapsedTime, setElapsedTime] = useState(0);
+            const [breathingNow, setBreathingNow] = useState(false);
+            const [peakBR, setPeakBR] = useState(0);
+            
+            // Manual expression marking
+            const [showExpressionMarker, setShowExpressionMarker] = useState(false);
+            const [manualExpressions, setManualExpressions] = useState([]);
+            const [showExpressionTable, setShowExpressionTable] = useState(false);
+            const [showRPEScale, setShowRPEScale] = useState(false);
+            
+            // Recovery tracking
+            const [showRecoveryTimer, setShowRecoveryTimer] = useState(false);
+            const [recoveryTimer, setRecoveryTimer] = useState(60);
+            const [isRecoveryRunning, setIsRecoveryRunning] = useState(false);
+            const [startingHR, setStartingHR] = useState('');
+            const [endingHR, setEndingHR] = useState('');
+            const [startingBR, setStartingBR] = useState(0);
+            const [endingBR, setEndingBR] = useState(0);
+            const [hrr60, setHrr60] = useState(0);
+            const [tiredness, setTiredness] = useState(5);
+            const [readiness, setReadiness] = useState(5);
+            
+            // Assessment worksheet fields
+            const [showAssessment, setShowAssessment] = useState(false);
+            const [climberName, setClimberName] = useState('');
+            const [climberAge, setClimberAge] = useState('');
+            const [sessionDate, setSessionDate] = useState(new Date().toISOString().split('T')[0]);
+            const [climbingVolume, setClimbingVolume] = useState('');
+            const [coachName, setCoachName] = useState('');
+            const [environment, setEnvironment] = useState('');
+            const [mentalState, setMentalState] = useState('');
+            const [climbStyle, setClimbStyle] = useState('Sport');
+            const [routeSector, setRouteSector] = useState('');
+            const [baselineHR, setBaselineHR] = useState('');
+            const [baselineBR, setBaselineBR] = useState(0);
+            
+            // Accelerometer tracking
+            const [motionEnabled, setMotionEnabled] = useState(false);
+            const [motionPermission, setMotionPermission] = useState('prompt'); // 'prompt', 'granted', 'denied', 'unsupported'
+            const [movementIntensity, setMovementIntensity] = useState(0);
+            const [climbingState, setClimbingState] = useState('rest'); // 'rest', 'climbing', 'crux'
+            const motionDataRef = useRef([]);
+            const movementHistoryRef = useRef([]);
+            const lastMotionTimeRef = useRef(0);
+            
+            // Voice recognition
+            const [voiceEnabled, setVoiceEnabled] = useState(false);
+            const [voiceSupported, setVoiceSupported] = useState(false);
+            const [lastVoiceCommand, setLastVoiceCommand] = useState('');
+            const [voiceCommandTime, setVoiceCommandTime] = useState(0);
+            const recognitionRef = useRef(null);
+            
+            // 60-second singing bowl chime
+            const [hasPlayed60SecondChime, setHasPlayed60SecondChime] = useState(false);
+            
+            // Audio recording
+            const [audioRecording, setAudioRecording] = useState(null);
+            const [audioURL, setAudioURL] = useState(null);
+            const mediaRecorderRef = useRef(null);
+            const audioChunksRef = useRef([]);
+            
+            // MFCC Timeline data
+            const [mfccTimeline, setMfccTimeline] = useState([]);
+            const mfccDataRef = useRef([]);
+            const audioPlayerRef = useRef(null);
+            
+            const audioContextRef = useRef(null);
+            const analyserRef = useRef(null);
+            const mediaStreamRef = useRef(null);
+            const animationFrameRef = useRef(null);
+            const breathTimestampsRef = useRef([]);
+            const lastBreathTimeRef = useRef(0);
+            const energyHistoryRef = useRef([]);
+
+            // Timer
+            useEffect(() => {
+                let interval;
+                if (isRecording) {
+                    interval = setInterval(() => {
+                        setElapsedTime(prev => prev + 1);
+                    }, 1000);
+                }
+                return () => clearInterval(interval);
+            }, [isRecording]);
+            
+            // Recovery timer
+            useEffect(() => {
+                let interval;
+                if (isRecoveryRunning && recoveryTimer > 0) {
+                    interval = setInterval(() => {
+                        setRecoveryTimer(prev => {
+                            if (prev <= 1) {
+                                setIsRecoveryRunning(false);
+                                // Capture ending BR
+                                setEndingBR(rawBR);
+                                // Play singing bowl when recovery timer completes
+                                playSingingBowl();
+                                console.log('🔔 Recovery complete - singing bowl chime played');
+                                return 0;
+                            }
+                            return prev - 1;
+                        });
+                    }, 1000);
+                }
+                return () => clearInterval(interval);
+            }, [isRecoveryRunning, recoveryTimer, rawBR]);
+            
+            // Motion sensor initialization
+            useEffect(() => {
+                // Check if DeviceMotionEvent is available
+                if (!window.DeviceMotionEvent) {
+                    setMotionPermission('unsupported');
+                    return;
+                }
+                
+                // On iOS 13+, permission is required but can only be requested via user gesture
+                // So we just check if the API exists and set to 'prompt' state
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    setMotionPermission('prompt'); // Need user to click button
+                } else {
+                    // Android or older iOS - permission not required
+                    setMotionPermission('granted');
+                }
+            }, []);
+            
+            // Handle motion permission request (iOS)
+            const requestMotionPermission = async () => {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    try {
+                        const permission = await DeviceMotionEvent.requestPermission();
+                        if (permission === 'granted') {
+                            setMotionPermission('granted');
+                            setMotionEnabled(true);
+                        } else {
+                            setMotionPermission('denied');
+                        }
+                    } catch (error) {
+                        console.error('Motion permission error:', error);
+                        setMotionPermission('denied');
+                    }
+                } else {
+                    // Already granted (Android/older iOS)
+                    setMotionEnabled(true);
+                }
+            };
+            
+            // Motion event listener
+            useEffect(() => {
+                if (!motionEnabled || motionPermission !== 'granted') return;
+                
+                const handleMotion = (event) => {
+                    const now = Date.now();
+                    
+                    // Get acceleration data (with gravity removed for better movement detection)
+                    const accel = event.accelerationIncludingGravity || event.acceleration;
+                    if (!accel) return;
+                    
+                    const x = accel.x || 0;
+                    const y = accel.y || 0;
+                    const z = accel.z || 0;
+                    
+                    // Get rotation data (gyroscope)
+                    const rotation = event.rotationRate || { alpha: 0, beta: 0, gamma: 0 };
+                    
+                    // Calculate movement intensity (magnitude of acceleration + rotation)
+                    const accelMagnitude = Math.sqrt(x*x + y*y + z*z);
+                    const rotationMagnitude = Math.sqrt(
+                        rotation.alpha**2 + rotation.beta**2 + rotation.gamma**2
+                    );
+                    
+                    // Reduce rotation weight further - it's often noisy
+                    const rawIntensity = accelMagnitude + (rotationMagnitude * 0.2);
+                    
+                    // Apply smoothing to reduce noise - average with previous reading
+                    const smoothedIntensity = movementHistoryRef.current.length > 0
+                        ? (rawIntensity + movementHistoryRef.current[movementHistoryRef.current.length - 1]) / 2
+                        : rawIntensity;
+                    
+                    setMovementIntensity(smoothedIntensity);
+                    
+                    // Track movement history for state detection
+                    movementHistoryRef.current.push(smoothedIntensity);
+                    if (movementHistoryRef.current.length > 50) { // Keep 50 samples (~1 second at 50Hz)
+                        movementHistoryRef.current.shift();
+                    }
+                    
+                    // Detect climbing state - LESS SENSITIVE THRESHOLDS
+                    if (movementHistoryRef.current.length >= 20) {
+                        const recentAvg = movementHistoryRef.current.slice(-20).reduce((a, b) => a + b, 0) / 20;
+                        const recentMax = Math.max(...movementHistoryRef.current.slice(-10));
+                        
+                        // State classification - HIGHER THRESHOLDS for real climbing movements
+                        // Phone in pocket/hand = ~5-15 intensity
+                        // Active climbing = 20-40 intensity  
+                        // Crux/dynamic moves = 50+ intensity
+                        if (recentMax > 50 && recentAvg > 25) {
+                            setClimbingState('crux'); // Very high intensity sustained = crux moment
+                        } else if (recentAvg > 18) {
+                            setClimbingState('climbing'); // Moderate sustained movement = climbing
+                        } else {
+                            setClimbingState('rest'); // Low movement = rest
+                        }
+                    }
+                    
+                    // Store motion data (throttled to ~20Hz to save memory)
+                    if (now - lastMotionTimeRef.current > 50 && isRecording) {
+                        motionDataRef.current.push({
+                            time: elapsedTime + (now % 1000) / 1000,
+                            intensity: smoothedIntensity,
+                            state: climbingState,
+                            accel: { x, y, z },
+                            rotation: { 
+                                alpha: rotation.alpha, 
+                                beta: rotation.beta, 
+                                gamma: rotation.gamma 
+                            }
+                        });
+                        lastMotionTimeRef.current = now;
+                        
+                        // Keep last 5 minutes
+                        if (motionDataRef.current.length > 6000) { // 20Hz * 300s
+                            motionDataRef.current.shift();
+                        }
+                    }
+                };
+                
+                window.addEventListener('devicemotion', handleMotion);
+                return () => window.removeEventListener('devicemotion', handleMotion);
+            }, [motionEnabled, motionPermission, isRecording, elapsedTime, climbingState]);
+            
+            // Voice recognition setup
+            useEffect(() => {
+                // Check if Speech Recognition is supported
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    setVoiceSupported(true);
+                    
+                    const recognition = new SpeechRecognition();
+                    recognition.continuous = true; // Keep listening
+                    recognition.interimResults = false; // Only final results
+                    recognition.lang = 'en-US';
+                    
+                    recognition.onresult = (event) => {
+                        const last = event.results.length - 1;
+                        const transcript = event.results[last][0].transcript.toLowerCase().trim();
+                        const confidence = event.results[last][0].confidence;
+                        
+                        console.log('🎤 Voice heard:', transcript, `(${(confidence * 100).toFixed(0)}% confidence)`);
+                        
+                        // Word to number mapping
+                        const wordToNumber = {
+                            'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4,
+                            'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10
+                        };
+                        
+                        // Try to extract number (digits or words)
+                        let rpeValue = null;
+                        
+                        // Pattern 1: Look for digit (e.g., "RPE 8", "rate 7", "8")
+                        const digitMatch = transcript.match(/(?:rpe|rate|effort|exertion)?\s*(\d+)/i);
+                        if (digitMatch) {
+                            rpeValue = parseInt(digitMatch[1]);
+                            console.log('✓ Matched digit pattern:', digitMatch[1]);
+                        }
+                        
+                        // Pattern 2: Look for number word (e.g., "RPE eight", "rate seven", "eight")
+                        if (rpeValue === null) {
+                            const wordMatch = transcript.match(/(?:rpe|rate|effort|exertion)?\s*(zero|one|two|three|four|five|six|seven|eight|nine|ten)/i);
+                            if (wordMatch) {
+                                rpeValue = wordToNumber[wordMatch[1].toLowerCase()];
+                                console.log('✓ Matched word pattern:', wordMatch[1], '→', rpeValue);
+                            }
+                        }
+                        
+                        // Pattern 3: Just the word alone (e.g., "eight", "seven")
+                        if (rpeValue === null) {
+                            const word = transcript.trim().toLowerCase();
+                            if (wordToNumber.hasOwnProperty(word)) {
+                                rpeValue = wordToNumber[word];
+                                console.log('✓ Matched standalone word:', word, '→', rpeValue);
+                            }
+                        }
+                        
+                        // If we found a valid RPE value, update it
+                        if (rpeValue !== null && rpeValue >= 0 && rpeValue <= 10) {
+                            console.log('✅ Setting RPE to:', rpeValue);
+                            setRpe(rpeValue);
+                            setLastVoiceCommand(`RPE ${rpeValue}`);
+                            setVoiceCommandTime(Date.now());
+                            
+                            // Clear command display after 3 seconds
+                            setTimeout(() => {
+                                setLastVoiceCommand('');
+                            }, 3000);
+                        } else {
+                            console.log('❌ No valid RPE value found in:', transcript);
+                        }
+                    };
+                    
+                    recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        if (event.error === 'no-speech') {
+                            // Restart if stopped due to silence
+                            if (voiceEnabled) {
+                                recognition.start();
+                            }
+                        }
+                    };
+                    
+                    recognition.onend = () => {
+                        // Auto-restart if still enabled
+                        if (voiceEnabled) {
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.log('Recognition already started');
+                            }
+                        }
+                    };
+                    
+                    recognitionRef.current = recognition;
+                } else {
+                    setVoiceSupported(false);
+                }
+            }, []);
+            
+            // Voice recognition control
+            useEffect(() => {
+                if (!voiceSupported || !recognitionRef.current) return;
+                
+                if (voiceEnabled) {
+                    try {
+                        recognitionRef.current.start();
+                        console.log('Voice recognition started');
+                    } catch (e) {
+                        console.log('Recognition already running');
+                    }
+                } else {
+                    try {
+                        recognitionRef.current.stop();
+                        console.log('Voice recognition stopped');
+                    } catch (e) {
+                        console.log('Recognition already stopped');
+                    }
+                }
+                
+                return () => {
+                    if (recognitionRef.current) {
+                        try {
+                            recognitionRef.current.stop();
+                        } catch (e) {}
+                    }
+                };
+            }, [voiceEnabled, voiceSupported]);
+            
+            // 60-second singing bowl chime
+            useEffect(() => {
+                if (isRecording && elapsedTime >= 60 && !hasPlayed60SecondChime) {
+                    playSingingBowl();
+                    setHasPlayed60SecondChime(true);
+                    console.log('🔔 60-second singing bowl chime played');
+                }
+                
+                // Reset chime flag when recording stops
+                if (!isRecording && hasPlayed60SecondChime) {
+                    setHasPlayed60SecondChime(false);
+                }
+            }, [isRecording, elapsedTime, hasPlayed60SecondChime]);
+
+            // Breath detection with EVIDENCE-BASED improvements from respiratory analysis research
+            const analyzeAudio = () => {
+                if (!analyserRef.current) return;
+                
+                const bufferLength = analyserRef.current.frequencyBinCount;
+                const freqData = new Uint8Array(bufferLength);
+                const timeData = new Uint8Array(bufferLength);
+                
+                analyserRef.current.getByteFrequencyData(freqData);
+                analyserRef.current.getByteTimeDomainData(timeData);
+                
+                const sampleRate = 16000;
+                
+                // PROVEN WORKING: 150-1500 Hz breathing band
+                // This is the range that was detecting breaths reliably!
+                const minBin = Math.floor((150 / (sampleRate / 2)) * bufferLength);
+                const maxBin = Math.floor((1500 / (sampleRate / 2)) * bufferLength);
+                
+                // Calculate energy in breathing band
+                let breathEnergy = 0;
+                for (let i = minBin; i < maxBin; i++) {
+                    breathEnergy += freqData[i];
+                }
+                breathEnergy = breathEnergy / (maxBin - minBin);
+                
+                // Calculate RMS from time domain
+                let rms = 0;
+                for (let i = 0; i < timeData.length; i++) {
+                    const normalized = (timeData[i] - 128) / 128;
+                    rms += normalized * normalized;
+                }
+                rms = Math.sqrt(rms / timeData.length) * 100;
+                
+                const combinedEnergy = Math.max(breathEnergy, rms);
+                setAudioLevel(combinedEnergy);
+                
+                // Store MFCC-style energy data for timeline visualization (simplified)
+                const mfccBands = [];
+                const numBands = 13;
+                const binRange = Math.floor((maxBin - minBin) / numBands);
+                
+                for (let band = 0; band < numBands; band++) {
+                    const startBin = minBin + (band * binRange);
+                    const endBin = Math.min(startBin + binRange, maxBin);
+                    let bandEnergy = 0;
+                    for (let i = startBin; i < endBin; i++) {
+                        bandEnergy += freqData[i];
+                    }
+                    mfccBands.push(bandEnergy / binRange);
+                }
+                
+                const spectralEnergy = mfccBands.reduce((a, b) => a + b, 0) / numBands;
+                
+                mfccDataRef.current.push({
+                    time: elapsedTime + (Date.now() % 1000) / 1000,
+                    energy: spectralEnergy,
+                    bands: mfccBands
+                });
+                
+                // Keep last 5 minutes
+                if (mfccDataRef.current.length > 18000) {
+                    mfccDataRef.current.shift();
+                }
+                
+                energyHistoryRef.current.push(combinedEnergy);
+                if (energyHistoryRef.current.length > 20) {
+                    energyHistoryRef.current.shift();
+                }
+                
+                const now = Date.now();
+                const timeSinceLastBreath = now - lastBreathTimeRef.current;
+                const minTimeBetweenBreaths = 1000;
+                
+                if (energyHistoryRef.current.length >= 15 && timeSinceLastBreath > minTimeBetweenBreaths) {
+                    const recent = energyHistoryRef.current.slice(-5);
+                    const earlier = energyHistoryRef.current.slice(-15, -10);
+                    const oldest = energyHistoryRef.current.slice(0, 5);
+                    
+                    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+                    const earlierAvg = earlier.reduce((a, b) => a + b, 0) / earlier.length;
+                    const oldestAvg = oldest.reduce((a, b) => a + b, 0) / oldest.length;
+                    
+                    // EXHALE DETECTION - Falling edge pattern (PROVEN to work!)
+                    const hadPeak = earlierAvg > oldestAvg + 5;        // Energy rose
+                    const nowFalling = recentAvg < earlierAvg - 3;     // Energy falling
+                    const aboveThreshold = earlierAvg > 15;            // Peak was significant
+                    
+                    const anySound = combinedEnergy > 12;
+                    setBreathingNow(anySound);
+                    
+                    // COUNT RAW EXHALE - back to working detection!
+                    // Removed overly strict exhale confirmation that was blocking everything
+                    if (hadPeak && nowFalling && aboveThreshold) {
+                        breathTimestampsRef.current.push(now);
+                        setBreathCount(prev => prev + 1);
+                        lastBreathTimeRef.current = now;
+                        
+                        const oneMinuteAgo = now - 60000;
+                        const recentBreaths = breathTimestampsRef.current.filter(t => t > oneMinuteAgo);
+                        const newRawBR = recentBreaths.length;
+                        setRawBR(newRawBR);
+                        
+                        if (newRawBR > peakBR) {
+                            setPeakBR(newRawBR);
+                        }
+                    }
+                } else {
+                    const anySound = combinedEnergy > 12;
+                    setBreathingNow(anySound);
+                }
+                
+                animationFrameRef.current = requestAnimationFrame(analyzeAudio);
+            };
+
+            const startRecording = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: true,
+                            sampleRate: 16000
+                        } 
+                    });
+                    mediaStreamRef.current = stream;
+                    
+                    // Audio analysis
+                    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)({
+                        sampleRate: 16000
+                    });
+                    const source = audioContextRef.current.createMediaStreamSource(stream);
+                    analyserRef.current = audioContextRef.current.createAnalyser();
+                    analyserRef.current.fftSize = 4096;
+                    analyserRef.current.smoothingTimeConstant = 0.1;
+                    source.connect(analyserRef.current);
+                    
+                    // Audio recording for playback
+                    mediaRecorderRef.current = new MediaRecorder(stream);
+                    audioChunksRef.current = [];
+                    
+                    mediaRecorderRef.current.ondataavailable = (event) => {
+                        audioChunksRef.current.push(event.data);
+                    };
+                    
+                    mediaRecorderRef.current.onstop = () => {
+                        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        setAudioRecording(audioBlob);
+                        setAudioURL(audioUrl);
+                    };
+                    
+                    mediaRecorderRef.current.start();
+                    setIsRecording(true);
+                    setElapsedTime(0);
+                    setBreathCount(0);
+                    setRawBR(0);
+                    setPeakBR(0);
+                    breathTimestampsRef.current = [];
+                    energyHistoryRef.current = [];
+                    setManualExpressions([]);
+                    mfccDataRef.current = [];
+                    setMfccTimeline([]);
+                    
+                    analyzeAudio();
+                    
+                } catch (err) {
+                    console.error('Error accessing microphone:', err);
+                    alert('Please allow microphone access');
+                }
+            };
+
+            const stopRecording = () => {
+                setIsRecording(false);
+                
+                if (animationFrameRef.current) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                }
+                
+                if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                    mediaRecorderRef.current.stop();
+                }
+                
+                if (mediaStreamRef.current) {
+                    mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                }
+                
+                if (audioContextRef.current) {
+                    audioContextRef.current.close();
+                }
+                
+                // Save MFCC timeline data
+                setMfccTimeline([...mfccDataRef.current]);
+                
+                // Capture peak BR as baseline for recovery
+                setStartingBR(rawBR);
+                
+                // Show expression marker after recording
+                setTimeout(() => setShowExpressionMarker(true), 500);
+            };
+            
+            const startRecoveryTimer = () => {
+                if (!startingHR || startingHR === '') {
+                    alert('Please enter your current heart rate first!');
+                    return;
+                }
+                setShowRecoveryTimer(true);
+                setIsRecoveryRunning(true);
+                setRecoveryTimer(60);
+                setStartingBR(rawBR);
+            };
+            
+            const calculateHRR60 = () => {
+                if (startingHR && endingHR) {
+                    const start = parseInt(startingHR);
+                    const end = parseInt(endingHR);
+                    const drop = start - end;
+                    setHrr60(drop);
+                    return drop;
+                }
+                return 0;
+            };
+            
+            const getHRR60Classification = (drop) => {
+                if (drop >= 18) return { class: 'Excellent', color: '#32CD32', desc: 'Strong parasympathetic tone, excellent aerobic fitness' };
+                if (drop >= 12) return { class: 'Moderate', color: '#87CEEB', desc: 'Adequate recovery, take more time between attempts' };
+                return { class: 'Fatigued', color: '#FF00FC', desc: 'Poor recovery, reset breathing & rest longer' };
+            };
+            
+            // Play singing bowl chime (Web Audio API synthesis)
+            const playSingingBowl = () => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Singing bowl has multiple harmonics - we'll layer 5 frequencies
+                const fundamentalFreq = 432; // Hz - healing frequency
+                const harmonics = [1, 2.4, 3.2, 4.1, 5.3]; // Harmonic ratios for metallic bowl sound
+                
+                harmonics.forEach((ratio, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(fundamentalFreq * ratio, now);
+                    
+                    // Each harmonic fades at different rate (creates shimmer effect)
+                    const decayTime = 3 + (index * 0.5); // 3-5.5 seconds
+                    gainNode.gain.setValueAtTime(0.2 / (index + 1), now); // Higher harmonics quieter
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + decayTime);
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start(now);
+                    oscillator.stop(now + decayTime);
+                });
+            };
+
+            const addManualExpression = (type, value) => {
+                const adjustment = value !== undefined ? value : 
+                    EXPRESSION_ADJUSTMENTS[type].adjustment ||
+                    EXPRESSION_ADJUSTMENTS[type].adjustments[0];
+                
+                setManualExpressions(prev => [...prev, {
+                    type,
+                    adjustment,
+                    emoji: EXPRESSION_ADJUSTMENTS[type].emoji,
+                    label: EXPRESSION_ADJUSTMENTS[type].label
+                }]);
+            };
+
+            const removeExpression = (index) => {
+                setManualExpressions(prev => prev.filter((_, i) => i !== index));
+            };
+
+            const resetSession = () => {
+                setElapsedTime(0);
+                setBreathCount(0);
+                setRawBR(0);
+                setPeakBR(0);
+                setRpe(5);
+                breathTimestampsRef.current = [];
+                energyHistoryRef.current = [];
+                lastBreathTimeRef.current = 0;
+                setManualExpressions([]);
+                setAudioRecording(null);
+                setAudioURL(null);
+                setShowExpressionMarker(false);
+                mfccDataRef.current = [];
+                setMfccTimeline([]);
+                // Reset recovery data
+                setShowRecoveryTimer(false);
+                setRecoveryTimer(60);
+                setIsRecoveryRunning(false);
+                setStartingHR('');
+                setEndingHR('');
+                setStartingBR(0);
+                setEndingBR(0);
+                setHrr60(0);
+                setTiredness(5);
+                setReadiness(5);
+                // Reset motion data
+                motionDataRef.current = [];
+                movementHistoryRef.current = [];
+                setMovementIntensity(0);
+                setClimbingState('rest');
+            };
+
+            const downloadAudio = () => {
+                if (audioRecording) {
+                    const url = URL.createObjectURL(audioRecording);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `pranaclimb_${Date.now()}.webm`;
+                    a.click();
+                }
+            };
+
+            const exportData = () => {
+                const data = {
+                    // Session info
+                    timestamp: new Date().toISOString(),
+                    sessionDate: sessionDate,
+                    duration: elapsedTime,
+                    
+                    // Climber profile
+                    climber: {
+                        name: climberName,
+                        age: climberAge,
+                        coach: coachName
+                    },
+                    
+                    // Climb details
+                    climb: {
+                        style: climbStyle,
+                        routeSector: routeSector,
+                        volume: climbingVolume,
+                        environment: environment,
+                        mentalState: mentalState
+                    },
+                    
+                    // Baseline
+                    baseline: {
+                        BR: baselineBR,
+                        HR: baselineHR
+                    },
+                    
+                    // Performance
+                    performance: {
+                        breathCount: breathCount,
+                        rawBR: rawBR,
+                        peakBR: peakBR,
+                        rpe: rpe,
+                        manualExpressions: manualExpressions,
+                        totalAdjustment: manualExpressions.reduce((sum, exp) => sum + exp.adjustment, 0)
+                    },
+                    
+                    // Recovery
+                    recovery: {
+                        startingHR: startingHR,
+                        endingHR: endingHR,
+                        hrr60: hrr60,
+                        hrrClassification: getHRR60Classification(hrr60).class,
+                        startingBR: startingBR,
+                        endingBR: endingBR,
+                        brDrop: startingBR - endingBR,
+                        tiredness: tiredness,
+                        readiness: readiness
+                    },
+                    
+                    // Motion tracking
+                    motion: {
+                        enabled: motionEnabled,
+                        dataPoints: motionDataRef.current.length,
+                        summary: motionDataRef.current.length > 0 ? {
+                            avgIntensity: (motionDataRef.current.reduce((s, d) => s + d.intensity, 0) / motionDataRef.current.length).toFixed(2),
+                            maxIntensity: Math.max(...motionDataRef.current.map(d => d.intensity)).toFixed(2),
+                            cruxMoments: motionDataRef.current.filter(d => d.state === 'crux').length,
+                            climbingTime: motionDataRef.current.filter(d => d.state === 'climbing' || d.state === 'crux').length / 20, // seconds
+                            restTime: motionDataRef.current.filter(d => d.state === 'rest').length / 20 // seconds
+                        } : null,
+                        timeline: motionDataRef.current // Full data for analysis
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pranaclimb_assessment_${Date.now()}.json`;
+                a.click();
+            };
+
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            return (
+                <div className="min-h-screen pb-8">
+                    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                        <div className="breathing-animation absolute top-20 right-20 w-96 h-96 rounded-full filter blur-3xl" 
+                             style={{ backgroundColor: '#87CEEB' }} />
+                        <div className="breathing-animation absolute bottom-20 left-20 w-96 h-96 rounded-full filter blur-3xl" 
+                             style={{ backgroundColor: '#32CD32', animationDelay: '1.5s' }} />
+                        <div className="breathing-animation absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full filter blur-3xl" 
+                             style={{ backgroundColor: '#FF00FC', animationDelay: '3s' }} />
+                    </div>
+
+                    <div className="relative z-10 max-w-7xl mx-auto px-4 py-6">
+                        {/* Simplified Header */}
+                        <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 mb-6 card-shadow slide-up border-2 border-gray-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <h1 className="text-4xl font-bold mb-1" style={{ color: '#FF00FC' }}>
+                                        pranaclimb
+                                    </h1>
+                                    <p className="text-gray-600 font-medium text-sm tracking-wider uppercase">
+                                        Love Breathe Climb
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <div className={`mono text-5xl font-bold transition-all duration-300 ${
+                                        elapsedTime === 60 && isRecording ? 'text-green-500 scale-110' : 'text-gray-900'
+                                    }`}>
+                                        {formatTime(elapsedTime)}
+                                    </div>
+                                    <div className="text-gray-500 text-sm font-semibold">
+                                        {elapsedTime === 60 && isRecording && (
+                                            <span className="mr-2 text-green-600">🔔</span>
+                                        )}
+                                        SESSION TIME
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Quick Start Guide */}
+                            {!isRecording && !audioRecording && (
+                                <div className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-2xl border-2 border-pink-200">
+                                    <p className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                        🚀 Quick Start Guide
+                                    </p>
+                                    <div className="grid md:grid-cols-4 gap-3">
+                                        <div className="text-center p-3 bg-white rounded-xl">
+                                            <div className="text-2xl mb-2">📝</div>
+                                            <div className="text-sm font-bold text-gray-900">1. Assessment</div>
+                                            <div className="text-xs text-gray-600">Fill in details</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-white rounded-xl">
+                                            <div className="text-2xl mb-2">🎙️</div>
+                                            <div className="text-sm font-bold text-gray-900">2. Record</div>
+                                            <div className="text-xs text-gray-600">Climb & breathe</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-white rounded-xl">
+                                            <div className="text-2xl mb-2">⏱️</div>
+                                            <div className="text-sm font-bold text-gray-900">3. Recovery</div>
+                                            <div className="text-xs text-gray-600">60s HR check</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-white rounded-xl">
+                                            <div className="text-2xl mb-2">💾</div>
+                                            <div className="text-sm font-bold text-gray-900">4. Export</div>
+                                            <div className="text-xs text-gray-600">Save data</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                            
+                            {/* Simplified Controls with Clear Flow */}
+                            <div className="space-y-4">
+                                {/* Step 1: Before Recording */}
+                                {!isRecording && !audioRecording && (
+                                    <div className="space-y-3">
+                                        <p className="text-sm font-bold text-gray-700 uppercase tracking-wider">📖 Read First (Optional)</p>
+                                        <div className="flex gap-3 flex-wrap">
+                                            <button
+                                                onClick={() => setShowRPEScale(!showRPEScale)}
+                                                className="text-white px-6 py-3 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                                style={{ backgroundColor: '#32CD32' }}
+                                            >
+                                                📖 Read RPE Scale
+                                            </button>
+                                            
+                                            <button
+                                                onClick={() => setShowExpressionTable(!showExpressionTable)}
+                                                className="text-white px-6 py-3 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                                style={{ backgroundColor: '#FF00FC' }}
+                                            >
+                                                📖 Read Expressions
+                                            </button>
+                                            
+                                            <button
+                                                onClick={() => setShowAssessment(!showAssessment)}
+                                                className="text-white px-6 py-3 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                                style={{ backgroundColor: '#87CEEB' }}
+                                            >
+                                                📝 {showAssessment ? 'Hide' : 'Fill'} Assessment
+                                            </button>
+                                        </div>
+                                        
+                                        <p className="text-sm font-bold text-gray-700 uppercase tracking-wider mt-4">🎬 Start Session</p>
+                                        <button
+                                            onClick={startRecording}
+                                            className="w-full text-white px-12 py-8 rounded-2xl font-bold transition transform active:scale-95 shadow-lg text-2xl"
+                                            style={{ 
+                                                background: 'linear-gradient(135deg, #FF00FC, #87CEEB)'
+                                            }}
+                                        >
+                                            ▶ START RECORDING
+                                        </button>
+                                        <p className="text-xs text-gray-500 text-center">
+                                            Press start, then climb. The app will detect your breathing automatically.
+                                        </p>
+                                    </div>
+                                )}
+                                
+                                {/* Step 2: During Recording */}
+                                {isRecording && (
+                                    <div className="space-y-3">
+                                        <div className="p-6 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl border-2 border-red-300">
+                                            <p className="text-xl font-bold text-red-700 mb-2 flex items-center justify-center gap-2">
+                                                🔴 Recording in Progress
+                                            </p>
+                                            <p className="text-sm text-gray-700 text-center mb-4">
+                                                Climb naturally. The app is detecting your breathing.
+                                            </p>
+                                            <button
+                                                onClick={stopRecording}
+                                                className="w-full bg-red-500 hover:bg-red-600 text-white px-12 py-8 rounded-2xl font-bold transition transform active:scale-95 shadow-lg text-2xl animate-pulse"
+                                            >
+                                                ■ STOP RECORDING
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Step 3: After Recording */}
+                                {audioRecording && (
+                                    <div className="space-y-3">
+                                        <p className="text-sm font-bold text-gray-700 uppercase tracking-wider">✅ Session Complete</p>
+                                        <div className="flex gap-3 flex-wrap">
+                                            <button
+                                                onClick={downloadAudio}
+                                                className="flex-1 min-w-[150px] text-white px-6 py-4 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                                style={{ backgroundColor: '#87CEEB' }}
+                                            >
+                                                🎙️ Download Audio
+                                            </button>
+                                            <button
+                                                onClick={exportData}
+                                                className="flex-1 min-w-[150px] text-white px-6 py-4 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                                style={{ backgroundColor: '#32CD32' }}
+                                            >
+                                                📊 Export Data
+                                            </button>
+                                            <button
+                                                onClick={resetSession}
+                                                className="flex-1 min-w-[150px] bg-gray-600 text-white px-6 py-4 rounded-xl font-bold transition transform active:scale-95 shadow-lg"
+                                            >
+                                                🔄 New Session
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Main metrics */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            {/* Raw BR */}
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 card-shadow border-4 border-gray-100 slide-up"
+                                 style={{ borderColor: '#87CEEB' }}>
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Raw BR
+                                    </span>
+                                    <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#87CEEB', color: 'white' }}>
+                                        Observed
+                                    </span>
+                                </div>
+                                <div className="mono text-6xl font-bold mb-2" style={{ color: '#87CEEB' }}>
+                                    {rawBR}
+                                </div>
+                                <div className="text-sm text-gray-600 font-semibold">Breaths/Min</div>
+                                <div className="mt-4 text-sm text-gray-500">
+                                    Total: {breathCount} breaths
+                                </div>
+                                <div className="mt-2 text-xs text-gray-400">
+                                    Peak: {peakBR} BPM
+                                </div>
+                            </div>
+
+                            {/* RPE */}
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 card-shadow border-2 slide-up" 
+                                 style={{ borderColor: '#32CD32' }}>
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        RPE
+                                    </span>
+                                    {voiceSupported && (
+                                        <button
+                                            onClick={() => setVoiceEnabled(!voiceEnabled)}
+                                            className={`text-xs px-3 py-1 rounded-full font-bold transition flex items-center gap-1 ${
+                                                voiceEnabled 
+                                                    ? 'bg-red-500 text-white animate-pulse' 
+                                                    : 'bg-gray-300 text-gray-600'
+                                            }`}
+                                            title="Enable voice commands to say RPE hands-free"
+                                        >
+                                            🎤 {voiceEnabled ? 'LISTENING' : 'Voice OFF'}
+                                        </button>
+                                    )}
+                                </div>
+                                
+                                {/* Voice command feedback */}
+                                {lastVoiceCommand && (
+                                    <div className="mb-3 p-2 bg-green-100 border-2 border-green-500 rounded-xl text-center animate-bounce">
+                                        <div className="text-sm font-bold text-green-700">
+                                            ✓ {lastVoiceCommand}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <div className="mono text-6xl font-bold mb-2" style={{ color: '#32CD32' }}>
+                                    {rpe}
+                                </div>
+                                <div className="text-sm text-gray-600 font-semibold mb-4">
+                                    Perceived Exertion
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="10"
+                                    value={rpe}
+                                    onChange={(e) => setRpe(parseInt(e.target.value))}
+                                    className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                                    style={{ 
+                                        background: `linear-gradient(to right, #87CEEB 0%, #32CD32 50%, #FF00FC 100%)`,
+                                        accentColor: '#32CD32'
+                                    }}
+                                />
+                                
+                                {/* Voice Instructions */}
+                                {voiceSupported && voiceEnabled && (
+                                    <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+                                        <p className="text-xs font-bold text-gray-900 mb-2">🎤 Voice Commands Active!</p>
+                                        <div className="text-xs text-gray-700 space-y-1">
+                                            <p><strong>Say:</strong> "RPE 8" or "eight" or "rate seven"</p>
+                                            <p className="text-gray-500 italic">Works while climbing - hands-free!</p>
+                                        </div>
+                                        <div className="mt-2 pt-2 border-t border-green-200">
+                                            <p className="text-xs text-gray-600">
+                                                💡 <strong>Not working?</strong> Make sure you're in a quieter area and speak clearly.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {voiceSupported && !voiceEnabled && (
+                                    <div className="mt-2 text-xs text-gray-400 text-center">
+                                        👆 Tap "Voice OFF" above for hands-free RPE logging
+                                    </div>
+                                )}
+                                {!voiceSupported && (
+                                    <div className="mt-2 text-xs text-orange-600 text-center bg-orange-50 p-2 rounded-lg">
+                                        Voice commands not available in this browser. Try Chrome or Safari.
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Audio Level */}
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 card-shadow border-2 border-gray-100 slide-up">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        🎙️ Audio
+                                    </span>
+                                </div>
+                                <div className="relative h-32 bg-gray-100 rounded-2xl overflow-hidden">
+                                    <div
+                                        className="absolute bottom-0 left-0 right-0 transition-all duration-100"
+                                        style={{ 
+                                            height: `${audioLevel}%`,
+                                            background: 'linear-gradient(to top, #87CEEB, #32CD32, #FF00FC)'
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <span className="mono text-4xl font-bold text-gray-800">
+                                            {audioLevel.toFixed(0)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2 text-center">
+                                    {isRecording ? '🔴 Recording' : audioRecording ? '✅ Saved' : 'Ready'}
+                                </p>
+                            </div>
+                            
+                            {/* Motion Tracking */}
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 card-shadow border-2 slide-up" 
+                                 style={{ borderColor: '#FF00FC' }}>
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        📱 Motion
+                                    </span>
+                                    {motionPermission === 'granted' && (
+                                        <button
+                                            onClick={() => setMotionEnabled(!motionEnabled)}
+                                            className={`text-xs px-3 py-1 rounded-full font-bold transition ${
+                                                motionEnabled 
+                                                    ? 'bg-green-500 text-white' 
+                                                    : 'bg-gray-300 text-gray-600'
+                                            }`}
+                                        >
+                                            {motionEnabled ? 'ON' : 'OFF'}
+                                        </button>
+                                    )}
+                                    {motionPermission === 'prompt' && (
+                                        <button
+                                            onClick={requestMotionPermission}
+                                            className="text-xs px-3 py-1 rounded-full font-bold bg-blue-500 text-white transition hover:bg-blue-600"
+                                        >
+                                            Enable
+                                        </button>
+                                    )}
+                                </div>
+                                
+                                {motionPermission === 'unsupported' && (
+                                    <div className="text-xs text-orange-600">Motion sensors not available on this device</div>
+                                )}
+                                
+                                {motionPermission === 'prompt' && (
+                                    <div className="space-y-2">
+                                        <div className="text-sm font-semibold text-gray-700">
+                                            Motion tracking available!
+                                        </div>
+                                        <div className="text-xs text-gray-600">
+                                            Click "Enable" to allow motion sensor access. This lets the app detect rest, climbing, and crux moments automatically.
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {motionPermission === 'denied' && (
+                                    <div className="text-xs text-red-600">
+                                        Motion permission denied. On iOS: Settings → Safari → Motion & Orientation Access
+                                    </div>
+                                )}
+                                
+                                {motionPermission === 'granted' && !motionEnabled && (
+                                    <div className="text-xs text-gray-600">
+                                        Enable to track rest, climbing, and crux moments
+                                    </div>
+                                )}
+                                
+                                {motionEnabled && (
+                                    <div className="space-y-3">
+                                        <div className={`px-3 py-2 rounded-xl text-center font-bold ${
+                                            climbingState === 'crux' ? 'bg-red-100 text-red-700' :
+                                            climbingState === 'climbing' ? 'bg-blue-100 text-blue-700' :
+                                            'bg-green-100 text-green-700'
+                                        }`}>
+                                            {climbingState === 'crux' ? '🔥 CRUX' :
+                                             climbingState === 'climbing' ? '🧗 CLIMBING' :
+                                             '😌 REST'}
+                                        </div>
+                                        
+                                        <div>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-gray-600">Intensity</span>
+                                                <span className="mono text-sm font-bold" style={{ color: '#FF00FC' }}>
+                                                    {movementIntensity.toFixed(1)}
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                                <div
+                                                    className="h-full transition-all duration-200"
+                                                    style={{
+                                                        width: `${Math.min(100, (movementIntensity / 60) * 100)}%`,
+                                                        background: climbingState === 'crux' 
+                                                            ? 'linear-gradient(to right, #FF00FC, #FF4444)'
+                                                            : climbingState === 'climbing'
+                                                            ? 'linear-gradient(to right, #87CEEB, #32CD32)'
+                                                            : 'linear-gradient(to right, #32CD32, #87CEEB)'
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="text-xs text-gray-500 text-center">
+                                            <div className="flex justify-between px-1">
+                                                <span>Rest &lt;18</span>
+                                                <span>Climb &gt;18</span>
+                                                <span>Crux &gt;50</span>
+                                            </div>
+                                        </div>
+                                        
+                                        {isRecording && motionDataRef.current.length > 0 && (
+                                            <div className="text-xs text-gray-500 text-center pt-1 border-t">
+                                                {motionDataRef.current.length} points
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Assessment Worksheet */}
+                        {showAssessment && (
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 mb-6 card-shadow border-2 slide-up"
+                                 style={{ borderColor: '#87CEEB' }}>
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#87CEEB' }}>
+                                    📝 Assessment Worksheet
+                                </h3>
+                                
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* Climber Profile */}
+                                    <div className="space-y-3">
+                                        <h4 className="font-bold text-gray-900 mb-3">Climber Profile</h4>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Name</label>
+                                            <input
+                                                type="text"
+                                                value={climberName}
+                                                onChange={(e) => setClimberName(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Climber name"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-xs font-semibold text-gray-600">Age</label>
+                                                <input
+                                                    type="number"
+                                                    value={climberAge}
+                                                    onChange={(e) => setClimberAge(e.target.value)}
+                                                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                    placeholder="Age"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-semibold text-gray-600">Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={sessionDate}
+                                                    onChange={(e) => setSessionDate(e.target.value)}
+                                                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Coach</label>
+                                            <input
+                                                type="text"
+                                                value={coachName}
+                                                onChange={(e) => setCoachName(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Coach name (if applicable)"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Climb Details */}
+                                    <div className="space-y-3">
+                                        <h4 className="font-bold text-gray-900 mb-3">Climb Details</h4>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Style</label>
+                                            <select
+                                                value={climbStyle}
+                                                onChange={(e) => setClimbStyle(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                            >
+                                                <option>Sport</option>
+                                                <option>Bouldering</option>
+                                                <option>Trad</option>
+                                                <option>Redpoint</option>
+                                                <option>Project</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Route / Sector</label>
+                                            <input
+                                                type="text"
+                                                value={routeSector}
+                                                onChange={(e) => setRouteSector(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Route name or sector"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Additional Info */}
+                                    <div className="space-y-3 md:col-span-2">
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Recent Volume/Intensity/Grade</label>
+                                            <textarea
+                                                value={climbingVolume}
+                                                onChange={(e) => setClimbingVolume(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Recent climbing activity..."
+                                                rows="2"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Environment (Altitude/Temperature/Humidity)</label>
+                                            <input
+                                                type="text"
+                                                value={environment}
+                                                onChange={(e) => setEnvironment(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Environmental conditions..."
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-gray-600">Mental/Emotional State (stress/anxiety/sleep)</label>
+                                            <textarea
+                                                value={mentalState}
+                                                onChange={(e) => setMentalState(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                placeholder="Mental state notes..."
+                                                rows="2"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Pre-Climb Baseline */}
+                                    <div className="md:col-span-2 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
+                                        <h4 className="font-bold text-gray-900 mb-3">Pre-Climb Baseline (2-3 min nasal rest)</h4>
+                                        <div className="grid md:grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-xs font-semibold text-gray-600">Resting BR (BPM)</label>
+                                                <input
+                                                    type="number"
+                                                    value={baselineBR}
+                                                    onChange={(e) => setBaselineBR(parseInt(e.target.value) || 0)}
+                                                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                    placeholder="Baseline breathing rate"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-semibold text-gray-600">Resting HR (BPM) - optional</label>
+                                                <input
+                                                    type="number"
+                                                    value={baselineHR}
+                                                    onChange={(e) => setBaselineHR(e.target.value)}
+                                                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                                                    placeholder="Baseline heart rate"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Audio Playback & Expression Marker */}
+                        {audioRecording && (
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 mb-6 card-shadow border-2 slide-up"
+                                 style={{ borderColor: '#FF00FC' }}>
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#FF00FC' }}>
+                                    🎙️ Audio Playback & Expression Marker
+                                </h3>
+                                
+                                {/* MFCC Timeline Visualization */}
+                                {mfccTimeline.length > 0 && (
+                                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-4 border-2"
+                                         style={{ borderColor: '#FF00FC' }}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="font-bold text-gray-900">📊 Breath Spectrum Timeline</h4>
+                                            <span className="text-xs text-gray-600">
+                                                See when expressions occurred
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Timeline Canvas */}
+                                        <div className="bg-white rounded-xl p-4 border-2 border-gray-200">
+                                            <div className="relative h-24 overflow-hidden">
+                                                <svg width="100%" height="100%" className="block">
+                                                    {/* Draw energy waveform */}
+                                                    {mfccTimeline.length > 1 && (() => {
+                                                        const maxEnergy = Math.max(...mfccTimeline.map(d => d.energy));
+                                                        const minEnergy = Math.min(...mfccTimeline.map(d => d.energy));
+                                                        const range = maxEnergy - minEnergy || 1;
+                                                        
+                                                        // Sample data points to fit screen (max 500 points)
+                                                        const step = Math.max(1, Math.floor(mfccTimeline.length / 500));
+                                                        const sampledData = mfccTimeline.filter((_, i) => i % step === 0);
+                                                        
+                                                        const width = 1000; // SVG viewBox width
+                                                        const height = 96;
+                                                        const xStep = width / sampledData.length;
+                                                        
+                                                        // Create path
+                                                        let pathD = '';
+                                                        sampledData.forEach((point, i) => {
+                                                            const x = i * xStep;
+                                                            const normalizedEnergy = (point.energy - minEnergy) / range;
+                                                            const y = height - (normalizedEnergy * height * 0.8) - 8;
+                                                            
+                                                            if (i === 0) {
+                                                                pathD += `M ${x} ${y}`;
+                                                            } else {
+                                                                pathD += ` L ${x} ${y}`;
+                                                            }
+                                                        });
+                                                        
+                                                        // Color gradient based on energy
+                                                        return (
+                                                            <>
+                                                                <defs>
+                                                                    <linearGradient id="energyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                                        <stop offset="0%" style={{ stopColor: '#FF00FC', stopOpacity: 0.8 }} />
+                                                                        <stop offset="50%" style={{ stopColor: '#32CD32', stopOpacity: 0.6 }} />
+                                                                        <stop offset="100%" style={{ stopColor: '#87CEEB', stopOpacity: 0.4 }} />
+                                                                    </linearGradient>
+                                                                </defs>
+                                                                
+                                                                {/* Filled area */}
+                                                                <path
+                                                                    d={`${pathD} L ${width} ${height} L 0 ${height} Z`}
+                                                                    fill="url(#energyGradient)"
+                                                                    opacity="0.3"
+                                                                />
+                                                                
+                                                                {/* Line */}
+                                                                <path
+                                                                    d={pathD}
+                                                                    fill="none"
+                                                                    stroke="url(#energyGradient)"
+                                                                    strokeWidth="2"
+                                                                />
+                                                                
+                                                                {/* Energy level indicators */}
+                                                                {sampledData.map((point, i) => {
+                                                                    const x = i * xStep;
+                                                                    const normalizedEnergy = (point.energy - minEnergy) / range;
+                                                                    
+                                                                    // Show dots for high energy (likely expressions)
+                                                                    if (normalizedEnergy > 0.7) {
+                                                                        const y = height - (normalizedEnergy * height * 0.8) - 8;
+                                                                        return (
+                                                                            <circle
+                                                                                key={i}
+                                                                                cx={x}
+                                                                                cy={y}
+                                                                                r="3"
+                                                                                fill="#FF00FC"
+                                                                                opacity="0.8"
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                    return null;
+                                                                })}
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </svg>
+                                            </div>
+                                            
+                                            {/* Legend */}
+                                            <div className="flex items-center justify-between mt-3 text-xs text-gray-600">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-1">
+                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#87CEEB' }}></div>
+                                                        <span>Quiet</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#32CD32' }}></div>
+                                                        <span>Normal</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF00FC' }}></div>
+                                                        <span>Expression</span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-gray-500">
+                                                    Duration: {formatTime(Math.floor(mfccTimeline[mfccTimeline.length - 1]?.time || elapsedTime))}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <p className="text-xs text-gray-600 mt-3 text-center">
+                                            💡 <strong>Spikes</strong> = Expressions (grunts, screams) • <strong>Valleys</strong> = Quiet breaths or holds
+                                        </p>
+                                    </div>
+                                )}
+                                
+                                {/* Audio Player */}
+                                <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+                                    <audio controls className="w-full" src={audioURL} />
+                                    <p className="text-xs text-gray-500 mt-2 text-center">
+                                        Listen carefully and mark expressions below
+                                    </p>
+                                </div>
+                                
+                                {/* Expression Buttons */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                    {Object.entries(EXPRESSION_ADJUSTMENTS).map(([key, data]) => (
+                                        <div key={key}>
+                                            {data.adjustments ? (
+                                                <div className="space-y-1">
+                                                    <div className="text-xs font-bold text-gray-600 mb-1">
+                                                        {data.emoji} {data.label}
+                                                    </div>
+                                                    {data.adjustments.map((val, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            onClick={() => addManualExpression(key, val)}
+                                                            className="w-full bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-gray-900 px-3 py-2 rounded-lg text-xs font-semibold transition"
+                                                        >
+                                                            {val > 0 ? '+' : ''}{val} BPM
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => addManualExpression(key)}
+                                                    className="w-full bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-gray-900 px-4 py-3 rounded-xl text-sm font-semibold transition"
+                                                >
+                                                    {data.emoji} {data.label}<br/>
+                                                    <span className="text-xs">+{data.adjustment} BPM</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                {/* Manual Expression List */}
+                                {manualExpressions.length > 0 && (
+                                    <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-4 border-2"
+                                         style={{ borderColor: '#FF00FC' }}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="font-bold text-gray-900">Marked Expressions</h4>
+                                            <span className="text-sm font-bold mono" style={{ color: '#FF00FC' }}>
+                                                Total: +{manualExpressions.reduce((s, e) => s + e.adjustment, 0)} BPM
+                                            </span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {manualExpressions.map((exp, idx) => (
+                                                <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xl">{exp.emoji}</span>
+                                                        <span className="font-semibold text-gray-900">{exp.label}</span>
+                                                        <span className="text-sm text-gray-600">
+                                                            ({exp.adjustment > 0 ? '+' : ''}{exp.adjustment} BPM)
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeExpression(idx)}
+                                                        className="text-red-500 hover:text-red-700 font-bold"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 60-Second Recovery Timer */}
+                        {audioRecording && (
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 mb-6 card-shadow border-2 slide-up"
+                                 style={{ borderColor: '#32CD32' }}>
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#32CD32' }}>
+                                    ⏱️ 60-Second Recovery Assessment
+                                </h3>
+                                
+                                {!showRecoveryTimer ? (
+                                    <div className="space-y-4">
+                                        <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl">
+                                            <p className="text-sm font-bold text-gray-900 mb-2">
+                                                💓 HRR₆₀ (Heart Rate Recovery in 60 seconds)
+                                            </p>
+                                            <p className="text-xs text-gray-700 mb-3">
+                                                Tracks parasympathetic reactivation and W'bal recovery capacity.
+                                                A faster recovery indicates better cardiorespiratory fitness.
+                                            </p>
+                                            
+                                            {/* Apple Watch Instructions */}
+                                            <div className="mb-3 p-3 bg-white rounded-xl border-2 border-blue-200">
+                                                <p className="text-xs font-bold text-gray-900 mb-2 flex items-center gap-1">
+                                                    ⌚ How to Check HR on Apple Watch:
+                                                </p>
+                                                <ol className="text-xs text-gray-700 space-y-1 ml-4">
+                                                    <li>1. Open <strong>Heart Rate</strong> app on watch</li>
+                                                    <li>2. Wait 3-5 seconds for reading</li>
+                                                    <li>3. Note the number (e.g., 145 BPM)</li>
+                                                    <li>4. Enter it below and start timer</li>
+                                                </ol>
+                                                <p className="text-xs text-gray-500 mt-2 italic">
+                                                    💡 Or use iPhone Health app → Heart Rate → Latest Reading
+                                                </p>
+                                            </div>
+                                            
+                                            <ul className="text-xs text-gray-700 space-y-1">
+                                                <li>• <strong>≥18 BPM drop:</strong> Excellent recovery, strong vagal tone</li>
+                                                <li>• <strong>12-17 BPM:</strong> Moderate recovery, take more time</li>
+                                                <li>• <strong>&lt;12 BPM:</strong> Fatigued, reset breathing & rest longer</li>
+                                            </ul>
+                                            <p className="text-xs text-gray-500 mt-2 italic flex items-center gap-1">
+                                                🔔 A singing bowl will chime at 60 seconds
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                                                    Current Heart Rate (BPM)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={startingHR}
+                                                    onChange={(e) => setStartingHR(e.target.value)}
+                                                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 text-lg font-bold"
+                                                    placeholder="Enter HR"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    💡 Use SPO2 monitor or check pulse manually
+                                                </p>
+                                            </div>
+                                            <div className="flex items-end">
+                                                <button
+                                                    onClick={startRecoveryTimer}
+                                                    className="w-full text-white px-6 py-4 rounded-xl font-bold transition transform active:scale-95 shadow-lg text-lg"
+                                                    style={{ backgroundColor: '#32CD32' }}
+                                                >
+                                                    ▶ Start 60s Recovery Timer
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {/* Timer Display */}
+                                        <div className="text-center p-8 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl">
+                                            <div className={`mono text-8xl font-bold mb-2 transition-all duration-300 ${
+                                                recoveryTimer === 0 ? 'text-green-500 scale-110' : recoveryTimer <= 10 ? 'text-pink-600' : 'text-green-600'
+                                            }`}>
+                                                {recoveryTimer}
+                                            </div>
+                                            <div className="text-xl font-bold text-gray-700 flex items-center justify-center gap-2">
+                                                seconds remaining
+                                                {recoveryTimer === 0 && <span className="text-3xl animate-bounce">🔔</span>}
+                                            </div>
+                                            {isRecoveryRunning && (
+                                                <div className="mt-4 text-sm text-gray-600">
+                                                    🫁 Current BR: <span className="mono font-bold">{rawBR} BPM</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Recovery Complete */}
+                                        {recoveryTimer === 0 && (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl border-2"
+                                                     style={{ borderColor: '#FF00FC' }}>
+                                                    <p className="text-lg font-bold text-gray-900 text-center mb-3">
+                                                        ✅ Recovery Assessment Complete!
+                                                    </p>
+                                                    
+                                                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                                                        <div>
+                                                            <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                                                                Ending Heart Rate (BPM)
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                value={endingHR}
+                                                                onChange={(e) => {
+                                                                    setEndingHR(e.target.value);
+                                                                    if (startingHR && e.target.value) {
+                                                                        setHrr60(parseInt(startingHR) - parseInt(e.target.value));
+                                                                    }
+                                                                }}
+                                                                className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 text-lg font-bold"
+                                                                placeholder="Enter HR now"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center">
+                                                            <button
+                                                                onClick={calculateHRR60}
+                                                                className="w-full text-white px-4 py-3 rounded-xl font-bold transition transform active:scale-95"
+                                                                style={{ backgroundColor: '#FF00FC' }}
+                                                            >
+                                                                Calculate HRR₆₀
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {hrr60 > 0 && (() => {
+                                                        const classification = getHRR60Classification(hrr60);
+                                                        return (
+                                                            <div className="p-4 bg-white rounded-xl border-2" style={{ borderColor: classification.color }}>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <span className="text-lg font-bold">HRR₆₀:</span>
+                                                                    <span className="mono text-3xl font-bold" style={{ color: classification.color }}>
+                                                                        {hrr60} BPM ↓
+                                                                    </span>
+                                                                </div>
+                                                                <div className="p-3 rounded-lg" style={{ backgroundColor: classification.color + '20' }}>
+                                                                    <div className="text-lg font-bold mb-1" style={{ color: classification.color }}>
+                                                                        {classification.class}
+                                                                    </div>
+                                                                    <div className="text-sm text-gray-700">
+                                                                        {classification.desc}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                                
+                                                {/* BR Drop */}
+                                                <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl">
+                                                    <p className="text-sm font-bold text-gray-900 mb-2">🫁 Breathing Rate Recovery</p>
+                                                    <div className="grid grid-cols-3 gap-4 text-center">
+                                                        <div>
+                                                            <div className="text-xs text-gray-600">Starting BR</div>
+                                                            <div className="mono text-2xl font-bold" style={{ color: '#FF00FC' }}>
+                                                                {startingBR}
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs text-gray-600">Ending BR</div>
+                                                            <div className="mono text-2xl font-bold" style={{ color: '#87CEEB' }}>
+                                                                {endingBR}
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs text-gray-600">Drop</div>
+                                                            <div className="mono text-2xl font-bold" style={{ color: '#32CD32' }}>
+                                                                {startingBR - endingBR} ↓
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-xs text-gray-600 mt-2 text-center">
+                                                        Target: ≤30 BPM for full recovery
+                                                    </p>
+                                                </div>
+                                                
+                                                {/* Subjective Markers */}
+                                                <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+                                                    <p className="text-sm font-bold text-gray-900 mb-3">
+                                                        🧠 Subjective Recovery Assessment
+                                                    </p>
+                                                    
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <label className="text-sm font-semibold text-gray-700">
+                                                                    How tired are you right now?
+                                                                </label>
+                                                                <span className="mono text-xl font-bold" style={{ color: '#FF00FC' }}>
+                                                                    {tiredness}/10
+                                                                </span>
+                                                            </div>
+                                                            <input
+                                                                type="range"
+                                                                min="1"
+                                                                max="10"
+                                                                value={tiredness}
+                                                                onChange={(e) => setTiredness(parseInt(e.target.value))}
+                                                                className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                                                                style={{ 
+                                                                    background: `linear-gradient(to right, #32CD32 0%, #87CEEB 50%, #FF00FC 100%)`,
+                                                                    accentColor: '#FF00FC'
+                                                                }}
+                                                            />
+                                                            <div className="flex justify-between text-xs text-gray-600 mt-1">
+                                                                <span>Fresh</span>
+                                                                <span>Exhausted</span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div>
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <label className="text-sm font-semibold text-gray-700">
+                                                                    How ready are you to climb a difficult boulder?
+                                                                </label>
+                                                                <span className="mono text-xl font-bold" style={{ color: '#32CD32' }}>
+                                                                    {readiness}/10
+                                                                </span>
+                                                            </div>
+                                                            <input
+                                                                type="range"
+                                                                min="1"
+                                                                max="10"
+                                                                value={readiness}
+                                                                onChange={(e) => setReadiness(parseInt(e.target.value))}
+                                                                className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                                                                style={{ 
+                                                                    background: `linear-gradient(to right, #FF00FC 0%, #87CEEB 50%, #32CD32 100%)`,
+                                                                    accentColor: '#32CD32'
+                                                                }}
+                                                            />
+                                                            <div className="flex justify-between text-xs text-gray-600 mt-1">
+                                                                <span>Not Ready</span>
+                                                                <span>Fully Ready</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <p className="text-xs text-gray-600 mt-3 italic">
+                                                        💡 Based on 2024 elite climber recovery study
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Results Summary */}
+                        {audioRecording && (
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 card-shadow border-2 border-gray-100 slide-up">
+                                <h3 className="text-xl font-bold mb-6 text-gray-900">
+                                    📊 Session Summary
+                                </h3>
+                                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                                    <div>
+                                        <div className="text-sm text-gray-600 mb-1">Raw BR</div>
+                                        <div className="mono text-4xl font-bold" style={{ color: '#87CEEB' }}>
+                                            {rawBR} BPM
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1">Peak: {peakBR} BPM</div>
+                                        <div className="text-xs text-gray-500">Total: {breathCount} breaths</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-600 mb-1">Expressions Marked</div>
+                                        <div className="mono text-4xl font-bold" style={{ color: '#FF00FC' }}>
+                                            {manualExpressions.length}
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            Total adjustment: {manualExpressions.reduce((s, e) => s + e.adjustment, 0) > 0 ? '+' : ''}{manualExpressions.reduce((s, e) => s + e.adjustment, 0)} BPM
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-600 mb-1">Session RPE</div>
+                                        <div className="mono text-4xl font-bold" style={{ color: '#32CD32' }}>
+                                            {rpe} / 10
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            Duration: {formatTime(elapsedTime)}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Recovery Summary (if completed) */}
+                                {hrr60 > 0 && (
+                                    <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl border-2"
+                                         style={{ borderColor: '#32CD32' }}>
+                                        <h4 className="font-bold text-gray-900 mb-3">💓 Recovery Assessment</h4>
+                                        <div className="grid md:grid-cols-4 gap-4">
+                                            <div className="text-center">
+                                                <div className="text-xs text-gray-600">HRR₆₀</div>
+                                                <div className="mono text-2xl font-bold" style={{ color: getHRR60Classification(hrr60).color }}>
+                                                    {hrr60} BPM
+                                                </div>
+                                                <div className="text-xs font-semibold mt-1" style={{ color: getHRR60Classification(hrr60).color }}>
+                                                    {getHRR60Classification(hrr60).class}
+                                                </div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-xs text-gray-600">BR Drop</div>
+                                                <div className="mono text-2xl font-bold" style={{ color: '#87CEEB' }}>
+                                                    {startingBR - endingBR} BPM
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    {startingBR} → {endingBR}
+                                                </div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-xs text-gray-600">Tiredness</div>
+                                                <div className="mono text-2xl font-bold" style={{ color: '#FF00FC' }}>
+                                                    {tiredness}/10
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    Subjective
+                                                </div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-xs text-gray-600">Readiness</div>
+                                                <div className="mono text-2xl font-bold" style={{ color: '#32CD32' }}>
+                                                    {readiness}/10
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    Subjective
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* RPE Scale Modal */}
+                        {showRPEScale && (
+                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                                 onClick={() => setShowRPEScale(false)}>
+                                <div className="bg-white rounded-3xl p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto card-shadow"
+                                     onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h2 className="text-3xl font-bold mb-2" style={{ color: '#32CD32' }}>
+                                                Table I — CR-10 RPE & Breathing Rate
+                                            </h2>
+                                            <p className="text-sm text-gray-600">
+                                                RP Sync–Aligned · Expression-Adjusted · Rhythm-Sensitive
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowRPEScale(false)}
+                                            className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b-2" style={{ borderColor: '#32CD32' }}>
+                                                    <th className="text-left p-2 font-bold text-gray-900">RPE</th>
+                                                    <th className="text-left p-2 font-bold text-gray-900">Zone</th>
+                                                    <th className="text-left p-2 font-bold text-gray-900">Effort</th>
+                                                    <th className="text-left p-2 font-bold text-gray-900">Breathing Cues</th>
+                                                    <th className="text-center p-2 font-bold text-gray-900">Raw BR</th>
+                                                    <th className="text-center p-2 font-bold text-gray-900">Effective BR*</th>
+                                                    <th className="text-left p-2 font-bold text-gray-900">Climbing Interpretation</th>
+                                                    <th className="text-left p-2 font-bold text-gray-900">W′bal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr className="border-b hover:bg-blue-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#87CEEB' }}>0</td>
+                                                    <td className="p-2 font-semibold">Baseline</td>
+                                                    <td className="p-2 text-gray-700">Rest / Recovery</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Nasal, calm, quiet, smooth, even</td>
+                                                    <td className="p-2 text-center mono">&lt;10</td>
+                                                    <td className="p-2 text-center">—</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Baseline / no exertion</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Full recharge</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-blue-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#87CEEB' }}>1</td>
+                                                    <td className="p-2 font-semibold">Recovery</td>
+                                                    <td className="p-2 text-gray-700">Very Easy</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Gentle nasal breathing</td>
+                                                    <td className="p-2 text-center mono">10–12</td>
+                                                    <td className="p-2 text-center">No adj</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Shaking out / rest stance</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Recharging</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-blue-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#87CEEB' }}>2</td>
+                                                    <td className="p-2 font-semibold">Warm-up</td>
+                                                    <td className="p-2 text-gray-700">Easy</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Conversational nasal or light oronasal</td>
+                                                    <td className="p-2 text-center mono">12–15</td>
+                                                    <td className="p-2 text-center">No adj</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Easy terrain / warm-up routes</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Minimal depletion</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-green-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#32CD32' }}>3</td>
+                                                    <td className="p-2 font-semibold">Aerobic</td>
+                                                    <td className="p-2 text-gray-700">Moderate</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Slightly deeper nasal or light oronasal</td>
+                                                    <td className="p-2 text-center mono">15–20</td>
+                                                    <td className="p-2 text-center">No adj</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Aerobic flow climbing</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Preserved</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-green-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#32CD32' }}>4</td>
+                                                    <td className="p-2 font-semibold">Aerobic+</td>
+                                                    <td className="p-2 text-gray-700">Somewhat Hard</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Controlled oronasal, steady rhythm</td>
+                                                    <td className="p-2 text-center mono">20–25</td>
+                                                    <td className="p-2 text-center">No adj</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Sustained movement</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Preserved / recharging</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-green-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#32CD32' }}>5</td>
+                                                    <td className="p-2 font-semibold">Heavy</td>
+                                                    <td className="p-2 text-gray-700">Hard</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Pumpy oronasal; micro-exhales; occasional grunts</td>
+                                                    <td className="p-2 text-center mono">25–30</td>
+                                                    <td className="p-2 text-center font-semibold" style={{ color: '#32CD32' }}>35–40</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Crux entry / positioning</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Light depletion</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-green-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#32CD32' }}>6</td>
+                                                    <td className="p-2 font-semibold">Heavy+</td>
+                                                    <td className="p-2 text-gray-700">Hard+</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Faster oronasal; tension rising; short BHs; early RP-timed exhales</td>
+                                                    <td className="p-2 text-center mono">30–35</td>
+                                                    <td className="p-2 text-center font-semibold" style={{ color: '#32CD32' }}>40–45</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Pre-crux loading</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Depleting</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-yellow-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#FF00FC' }}>7</td>
+                                                    <td className="p-2 font-semibold">High Heavy</td>
+                                                    <td className="p-2 text-gray-700">Very Hard</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Mouth breathing; controlled rhythm; sparse grunts/screams</td>
+                                                    <td className="p-2 text-center mono">35–40</td>
+                                                    <td className="p-2 text-center font-semibold" style={{ color: '#FF00FC' }}>42–45</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Highest heavy effort below CP</td>
+                                                    <td className="p-2 text-gray-600 text-xs">W′bal stable → falling</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-pink-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#FF00FC' }}>8</td>
+                                                    <td className="p-2 font-semibold">CP Zone</td>
+                                                    <td className="p-2 text-gray-700">Extremely Hard</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Strong oral breathing; RP Sync active; expressive control</td>
+                                                    <td className="p-2 text-center mono">40–45</td>
+                                                    <td className="p-2 text-center font-bold" style={{ color: '#FF00FC' }}>CP ≈ 45</td>
+                                                    <td className="p-2 text-gray-700 text-xs font-semibold">Critical Power (CP)</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Gradual depletion</td>
+                                                </tr>
+                                                <tr className="border-b hover:bg-pink-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#FF00FC' }}>9</td>
+                                                    <td className="p-2 font-semibold">RCP approach</td>
+                                                    <td className="p-2 text-gray-700">Near Maximal</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Hyperventilation or rhythmic 1:1; screams / BHs</td>
+                                                    <td className="p-2 text-center mono">45–55</td>
+                                                    <td className="p-2 text-center font-bold" style={{ color: '#FF00FC' }}>&gt;55</td>
+                                                    <td className="p-2 text-gray-700 text-xs">Above CP → RCP</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Rapid depletion</td>
+                                                </tr>
+                                                <tr className="hover:bg-red-50">
+                                                    <td className="p-2 mono font-bold" style={{ color: '#FF00FC' }}>10</td>
+                                                    <td className="p-2 font-semibold">Severe / RCP+</td>
+                                                    <td className="p-2 text-gray-700">Maximal</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Breathless or chaotic 1:1; sustained BHs; uncontrolled</td>
+                                                    <td className="p-2 text-center mono">≥60</td>
+                                                    <td className="p-2 text-center font-bold" style={{ color: '#FF00FC' }}>≥60</td>
+                                                    <td className="p-2 text-gray-700 text-xs font-semibold">RCP exceeded · terminal</td>
+                                                    <td className="p-2 text-gray-600 text-xs">Full exhaustion</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div className="mt-6 p-4 bg-gray-50 rounded-2xl text-xs">
+                                        <p className="font-bold text-gray-900 mb-2">
+                                            * Effective BR = Raw BR + expression adjustments 🔑
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-pink-50 rounded-2xl border-2"
+                                         style={{ borderColor: '#32CD32' }}>
+                                        <p className="text-sm font-bold text-gray-900 mb-3">📋 Table Notes:</p>
+                                        <div className="space-y-2 text-xs text-gray-700">
+                                            <div className="flex gap-2">
+                                                <span className="font-bold" style={{ color: '#32CD32' }}>•</span>
+                                                <p><strong>Sport/Trad:</strong> +15 BPM adjustment cap per 60s</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <span className="font-bold" style={{ color: '#87CEEB' }}>•</span>
+                                                <p><strong>Bouldering:</strong> no cap</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <span className="font-bold" style={{ color: '#FF00FC' }}>•</span>
+                                                <p><strong>Raw BR ≥ 60 BPM:</strong> no correction applied (ceiling)</p>
+                                            </div>
+                                            <div className="mt-3 p-3 bg-white rounded-lg border border-gray-200">
+                                                <p className="font-bold text-gray-900 mb-2">🧠 1:1 Breathing (~60 BPM):</p>
+                                                <p className="mb-2">Appears in elite climbers (e.g. Anna Hazelnutt, Freja Shannon) and must be interpreted by <strong>rhythm, not rate alone</strong>:</p>
+                                                <ul className="ml-4 space-y-1">
+                                                    <li>→ Classify by Effective BR + rhythm</li>
+                                                    <li>→ W′bal depletes fast but <em>predictably</em></li>
+                                                </ul>
+                                                <p className="mt-2 font-semibold">Chaotic 1:1 breathing = panic / inefficiency:</p>
+                                                <ul className="ml-4 space-y-1">
+                                                    <li>→ Higher energetic cost</li>
+                                                    <li>→ Apply scream-density override / inefficiency multiplier</li>
+                                                    <li>→ W′bal drains <strong>disproportionately</strong></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl border-2"
+                                         style={{ borderColor: '#FF00FC' }}>
+                                        <p className="text-sm font-bold text-center text-gray-900">
+                                            🔑 Raw BR shows what you see. Effective BR shows what it costs. Rhythm shows how well it's controlled.
+                                        </p>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => setShowRPEScale(false)}
+                                        className="w-full mt-6 text-white px-8 py-4 rounded-2xl font-bold transition transform active:scale-95 shadow-lg"
+                                        style={{ backgroundColor: '#32CD32' }}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Expression Table Modal */}
+                        {showExpressionTable && (
+                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                                 onClick={() => setShowExpressionTable(false)}>
+                                <div className="bg-white rounded-3xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto card-shadow"
+                                     onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-3xl font-bold" style={{ color: '#FF00FC' }}>
+                                            Expression Table
+                                        </h2>
+                                        <button
+                                            onClick={() => setShowExpressionTable(false)}
+                                            className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                    
+                                    <p className="text-sm text-gray-600 mb-6">
+                                        <strong>FINAL – No Stacking</strong>
+                                    </p>
+                                    
+                                    <div className="space-y-3">
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">🔇</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Breath hold</div>
+                                                    <div className="text-sm text-gray-600">Bracing / pressure</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#FF00FC' }}>
+                                                +2 → +10 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">💪</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Grunt</div>
+                                                    <div className="text-sm text-gray-600">Force transfer</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#32CD32' }}>
+                                                +3 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">😱</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Scream</div>
+                                                    <div className="text-sm text-gray-600">Max neural drive</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#FF00FC' }}>
+                                                +5 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">👃</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Strong nasal inhale</div>
+                                                    <div className="text-sm text-gray-600">Diaphragm priming</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#87CEEB' }}>
+                                                +2 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">🎉</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">YES / WOO</div>
+                                                    <div className="text-sm text-gray-600">Emotional release</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#32CD32' }}>
+                                                +1 → +2 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">😮‍💨</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Sigh / "ahh"</div>
+                                                    <div className="text-sm text-gray-600">Parasympathetic reset</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#87CEEB' }}>
+                                                0 → −1 BPM
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">🧠</span>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">RP (latent)</div>
+                                                    <div className="text-sm text-gray-600">Neural prep (no ventilation)</div>
+                                                </div>
+                                            </div>
+                                            <div className="mono font-bold" style={{ color: '#32CD32' }}>
+                                                +1 BPM
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-pink-50 rounded-2xl border-2"
+                                         style={{ borderColor: '#FF00FC' }}>
+                                        <p className="text-sm font-bold text-gray-900 mb-2">Critical Rule:</p>
+                                        <p className="text-sm text-gray-700">
+                                            <strong>RP Sync never stacks with expressions.</strong><br/>
+                                            RP tells <em>when</em> the breath happens.<br/>
+                                            Expressions tell <em>what</em> the breath is.
+                                        </p>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => setShowExpressionTable(false)}
+                                        className="w-full mt-6 text-white px-8 py-4 rounded-2xl font-bold transition transform active:scale-95 shadow-lg"
+                                        style={{ backgroundColor: '#FF00FC' }}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<PranaclimbApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

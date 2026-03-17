@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lungs & Trees - We Are Nature</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d4a3e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #dcedc1;
+            text-transform: none;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover .panel-image {
+            transform: scale(1.05);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .upload-overlay:hover {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .upload-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #a8e6cf;
+            font-size: 1.1rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .o2-particle {
+            background: #a8e6cf;
+            box-shadow: 0 0 15px #a8e6cf;
+            animation: floatO2 5s ease-in-out infinite;
+        }
+
+        .co2-particle {
+            background: #ffd3b6;
+            box-shadow: 0 0 15px #ffd3b6;
+            animation: floatCO2 5s ease-in-out infinite;
+        }
+
+        @keyframes floatO2 {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translate(120px, -120px) scale(1.5); opacity: 0; }
+        }
+
+        @keyframes floatCO2 {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translate(-120px, -120px) scale(1.5); opacity: 0; }
+        }
+
+        .quote {
+            text-align: center;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(168, 230, 207, 0.3);
+            font-style: italic;
+            color: #dcedc1;
+        }
+
+        .quote strong {
+            color: #a8e6cf;
+            font-weight: bold;
+            font-size: 1.7rem;
+        }
+
+        .cycle-indicator {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 1.4rem;
+        }
+
+        .arrow {
+            display: inline-block;
+            font-size: 3rem;
+            animation: pulse 2s ease-in-out infinite;
+            margin: 0 20px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .gas-label {
+            position: absolute;
+            top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            animation: labelPulse 3s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes labelPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .lung-label {
+            right: 15px;
+            color: #a8e6cf;
+            border: 2px solid #a8e6cf;
+        }
+
+        .tree-label {
+            left: 15px;
+            color: #ffd3b6;
+            border: 2px solid #ffd3b6;
+        }
+
+        .instructions {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(168, 230, 207, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(168, 230, 207, 0.3);
+        }
+
+        .instructions p {
+            color: #dcedc1;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🫁 The Breath of Life 🌳</h1>
+        </div>
+
+        <div class="instructions">
+            <p>📸 <strong>Click on each panel to upload your own images</strong></p>
+            <p>Add a beautiful lung X-ray or diagram on the left, and a majestic tree on the right</p>
+        </div>
+
+        <div class="comparison">
+            <!-- Lung Panel -->
+            <div class="panel">
+                <h2>This is a lung.</h2>
+                <div class="image-container">
+                    <img id="lungImage" class="panel-image" style="display: none;" alt="Lung">
+                    <div id="lungUpload" class="upload-overlay" onclick="document.getElementById('lungInput').click()">
+                        <div class="upload-icon">🫁</div>
+                        <div class="upload-text">Click to upload lung image</div>
+                    </div>
+                    <div class="gas-label lung-label">O₂ ↓</div>
+                    <div id="lungParticles" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
+                </div>
+                <input type="file" id="lungInput" accept="image/*" onchange="loadImage(event, 'lungImage', 'lungUpload')">
+            </div>
+
+            <!-- Tree Panel -->
+            <div class="panel">
+                <h2>This is a tree.</h2>
+                <div class="image-container">
+                    <img id="treeImage" class="panel-image" style="display: none;" alt="Tree">
+                    <div id="treeUpload" class="upload-overlay" onclick="document.getElementById('treeInput').click()">
+                        <div class="upload-icon">🌳</div>
+                        <div class="upload-text">Click to upload tree image</div>
+                    </div>
+                    <div class="gas-label tree-label">CO₂ ↓</div>
+                    <div id="treeParticles" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
+                </div>
+                <input type="file" id="treeInput" accept="image/*" onchange="loadImage(event, 'treeImage', 'treeUpload')">
+            </div>
+        </div>
+
+        <div class="cycle-indicator">
+            <span class="arrow">→</span>
+            <strong style="color: #a8e6cf;">O₂</strong>
+            <span class="arrow">⇄</span>
+            <strong style="color: #ffd3b6;">CO₂</strong>
+            <span class="arrow">←</span>
+        </div>
+
+        <div class="quote">
+            We breathe in what trees breathe out,<br>
+            and they breathe in what we breathe out.<br>
+            <strong>We are nature.</strong>
+        </div>
+    </div>
+
+    <script>
+        // Load image from file input
+        function loadImage(event, imageId, overlayId) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(imageId);
+                    const overlay = document.getElementById(overlayId);
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    overlay.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Create floating particles
+        function createParticle(container, className) {
+            const particle = document.createElement('div');
+            particle.className = `particle ${className}`;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            container.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 5000);
+        }
+
+        // Continuously create particles
+        setInterval(() => {
+            const lungContainer = document.getElementById('lungParticles');
+            const treeContainer = document.getElementById('treeParticles');
+            
+            if (lungContainer) {
+                createParticle(lungContainer, 'o2-particle');
+                createParticle(lungContainer, 'o2-particle');
+            }
+            if (treeContainer) {
+                createParticle(treeContainer, 'co2-particle');
+                createParticle(treeContainer, 'co2-particle');
+            }
+        }, 800);
+    </script>
+</body>
+</html>

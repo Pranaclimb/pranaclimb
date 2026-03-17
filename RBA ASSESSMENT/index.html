@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranaclimb Core RBA - Quick Coach</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Icon components
+        const Play = () => (
+            <svg className="inline" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Pause = () => (
+            <svg className="inline" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const RotateCcw = () => (
+            <svg className="inline" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        );
+
+        const CheckCircle = () => (
+            <svg className="inline" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const AlertCircle = () => (
+            <svg className="inline" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        function PranaclimbRBACoach() {
+            const [step, setStep] = useState(0);
+            const [timerRunning, setTimerRunning] = useState(false);
+            const [timerSeconds, setTimerSeconds] = useState(0);
+            const [cruxStart, setCruxStart] = useState(null);
+            const [cruxEnd, setCruxEnd] = useState(null);
+            
+            const [data, setData] = useState({
+                restingBR: '', restingHR: '', mentalState: '', breathPattern: '',
+                climbStart: '', cruxStartTime: '', cruxEndTime: '',
+                screams: 0, grunts: 0, breathHolds: 0, sighs: 0, nasalInhales: 0, yesWoohoo: 0,
+                rpe: '', hrDropOff: '', hr60s: '', recoveryTime: '', recoveryFeel: '',
+                rawBR: '', bhAdjustment: 0, gruntAdjustment: 0, screamAdjustment: 0,
+                nasalAdjustment: 0, yesAdjustment: 0, sighAdjustment: 0
+            });
+
+            useEffect(() => {
+                let interval;
+                if (timerRunning) {
+                    interval = setInterval(() => {
+                        setTimerSeconds(prev => prev + 1);
+                    }, 1000);
+                }
+                return () => clearInterval(interval);
+            }, [timerRunning]);
+
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const startTimer = () => {
+                setTimerRunning(true);
+                if (timerSeconds === 0) {
+                    setData({...data, climbStart: new Date().toLocaleTimeString()});
+                }
+            };
+
+            const stopTimer = () => setTimerRunning(false);
+            const resetTimer = () => {
+                setTimerRunning(false);
+                setTimerSeconds(0);
+                setCruxStart(null);
+                setCruxEnd(null);
+            };
+
+            const markCruxStart = () => {
+                setCruxStart(timerSeconds);
+                setData({...data, cruxStartTime: formatTime(timerSeconds)});
+            };
+
+            const markCruxEnd = () => {
+                setCruxEnd(timerSeconds);
+                setData({...data, cruxEndTime: formatTime(timerSeconds)});
+            };
+
+            const calculateAdjustments = () => {
+                const bh = data.breathHolds * 5;
+                const grunt = data.grunts * 3;
+                const scream = data.screams * 5;
+                const nasal = data.nasalInhales * 2;
+                const yes = data.yesWoohoo * 1.5;
+                const sigh = data.sighs * -0.5;
+                
+                setData({
+                    ...data,
+                    bhAdjustment: bh,
+                    gruntAdjustment: grunt,
+                    screamAdjustment: scream,
+                    nasalAdjustment: nasal,
+                    yesAdjustment: yes,
+                    sighAdjustment: sigh
+                });
+            };
+
+            const totalAdjustment = Math.min(
+                data.bhAdjustment + data.gruntAdjustment + data.screamAdjustment + 
+                data.nasalAdjustment + data.yesAdjustment + data.sighAdjustment,
+                15
+            );
+
+            const effectiveBR = parseFloat(data.rawBR || 0) + totalAdjustment;
+            
+            const getZone = (br) => {
+                if (br < 35) return { zone: 0, label: 'Sub-threshold', color: 'bg-green-500' };
+                if (br < 45) return { zone: 1, label: 'Below CP', color: 'bg-yellow-500' };
+                if (br <= 48) return { zone: 2, label: 'At CP', color: 'bg-orange-500' };
+                if (br <= 55) return { zone: 3, label: 'Above CP → RCP', color: 'bg-red-500' };
+                return { zone: 4, label: 'Redline (>RCP)', color: 'bg-red-800' };
+            };
+
+            const hrr60 = parseFloat(data.hrDropOff || 0) - parseFloat(data.hr60s || 0);
+
+            const steps = [
+                { title: '1. Set-Up', icon: '🎯' },
+                { title: '2. Baseline', icon: '📊' },
+                { title: '3. 4-Min Climb', icon: '🧗' },
+                { title: '4. Post-Climb', icon: '💓' },
+                { title: '5. Analysis', icon: '📈' },
+                { title: '6. Results', icon: '✅' }
+            ];
+
+            const updateData = (field, value) => setData({...data, [field]: value});
+            const increment = (field) => setData({...data, [field]: data[field] + 1});
+            const decrement = (field) => setData({...data, [field]: Math.max(0, data[field] - 1)});
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-4xl">
+                                    🫁
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold text-indigo-900">Pranaclimb Core RBA</h1>
+                                    <p className="text-indigo-600">4-Minute Quick Coach Checklist</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center">
+                                {steps.map((s, idx) => (
+                                    <div key={idx} className="flex flex-col items-center">
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all ${
+                                            step === idx ? 'bg-indigo-600 text-white scale-110' : 
+                                            step > idx ? 'bg-green-500 text-white' : 'bg-gray-200'
+                                        }`}>
+                                            {step > idx ? '✓' : s.icon}
+                                        </div>
+                                        <span className="text-xs mt-2 text-center max-w-[80px]">{s.title}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl shadow-xl p-8">
+                            {step === 0 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">Equipment Check</h2>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-indigo-50 rounded-xl">
+                                            <h3 className="font-bold mb-2">✅ Required</h3>
+                                            <ul className="space-y-2 text-sm">
+                                                <li>📱 Smartphone / Audio Recording</li>
+                                                <li>⏱️ Timer / Stopwatch</li>
+                                                <li>📋 CR-10 RPE Scale</li>
+                                            </ul>
+                                        </div>
+                                        <div className="p-4 bg-gray-50 rounded-xl">
+                                            <h3 className="font-bold mb-2">⭐ Optional</h3>
+                                            <ul className="space-y-2 text-sm">
+                                                <li>💓 HR Strap / Watch</li>
+                                                <li>🫁 PEFR Meter</li>
+                                                <li>🩺 Pulse Oximeter</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                                        <p className="text-sm"><strong>Important:</strong> Start audio recording before the climb begins!</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 1 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">Baseline Measurements</h2>
+                                    <p className="text-gray-600">2-3 minutes, off the wall, breathing through nose</p>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">Resting BR (BPM)</label>
+                                            <input 
+                                                type="number" 
+                                                value={data.restingBR}
+                                                onChange={(e) => updateData('restingBR', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., 12"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">Resting HR (BPM) - Optional</label>
+                                            <input 
+                                                type="number"
+                                                value={data.restingHR}
+                                                onChange={(e) => updateData('restingHR', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., 65"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">Mental/Emotional State</label>
+                                            <select 
+                                                value={data.mentalState}
+                                                onChange={(e) => updateData('mentalState', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                            >
+                                                <option value="">Select...</option>
+                                                <option value="calm">Calm</option>
+                                                <option value="stressed">Stressed</option>
+                                                <option value="excited">Excited</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">Breathing Pattern Notes</label>
+                                            <input 
+                                                type="text"
+                                                value={data.breathPattern}
+                                                onChange={(e) => updateData('breathPattern', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., upper chest, breath holding"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">4-Minute Climb Timer</h2>
+                                    <p className="text-gray-600">Mark the 60-second crux window during the climb</p>
+                                    
+                                    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+                                        <div className="text-6xl font-bold mb-4">{formatTime(timerSeconds)}</div>
+                                        <div className="text-xl mb-6">
+                                            {timerSeconds < 240 ? `${240 - timerSeconds}s remaining` : 'Time Complete!'}
+                                        </div>
+                                        
+                                        <div className="flex justify-center gap-4 mb-6">
+                                            <button 
+                                                onClick={startTimer}
+                                                disabled={timerRunning}
+                                                className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold disabled:opacity-50 hover:bg-indigo-50 transition"
+                                            >
+                                                <Play /> Start
+                                            </button>
+                                            <button 
+                                                onClick={stopTimer}
+                                                disabled={!timerRunning}
+                                                className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold disabled:opacity-50 hover:bg-indigo-50 transition"
+                                            >
+                                                <Pause /> Pause
+                                            </button>
+                                            <button 
+                                                onClick={resetTimer}
+                                                className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-indigo-50 transition"
+                                            >
+                                                <RotateCcw /> Reset
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="flex justify-center gap-4">
+                                            <button 
+                                                onClick={markCruxStart}
+                                                disabled={!timerRunning || cruxStart !== null}
+                                                className="bg-yellow-400 text-yellow-900 px-6 py-3 rounded-lg font-bold disabled:opacity-50 hover:bg-yellow-300 transition"
+                                            >
+                                                Mark Crux Start
+                                            </button>
+                                            <button 
+                                                onClick={markCruxEnd}
+                                                disabled={!timerRunning || cruxStart === null || cruxEnd !== null}
+                                                className="bg-red-400 text-red-900 px-6 py-3 rounded-lg font-bold disabled:opacity-50 hover:bg-red-300 transition"
+                                            >
+                                                Mark Crux End
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {cruxStart !== null && (
+                                        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                                            <p><strong>Crux Start:</strong> {formatTime(cruxStart)}</p>
+                                            {cruxEnd !== null && <p><strong>Crux End:</strong> {formatTime(cruxEnd)}</p>}
+                                            {cruxEnd !== null && <p><strong>Duration:</strong> {cruxEnd - cruxStart} seconds</p>}
+                                        </div>
+                                    )}
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {[
+                                            { field: 'screams', label: 'Screams/Yells', color: 'red' },
+                                            { field: 'grunts', label: 'Grunts/Passats', color: 'orange' },
+                                            { field: 'breathHolds', label: 'Breath Holds', color: 'purple' },
+                                            { field: 'nasalInhales', label: 'Nasal Inhales', color: 'blue' },
+                                            { field: 'yesWoohoo', label: 'Yes/Woohoo', color: 'green' },
+                                            { field: 'sighs', label: 'Sighs/Ahh', color: 'gray' }
+                                        ].map(item => (
+                                            <div key={item.field} className={`p-4 bg-${item.color}-50 rounded-lg`}>
+                                                <label className="text-sm font-semibold">{item.label}</label>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <button onClick={() => decrement(item.field)} className={`bg-${item.color}-200 px-3 py-1 rounded`}>-</button>
+                                                    <span className="text-2xl font-bold">{data[item.field]}</span>
+                                                    <button onClick={() => increment(item.field)} className={`bg-${item.color}-200 px-3 py-1 rounded`}>+</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 3 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">Post-Climb Data</h2>
+                                    <p className="text-gray-600">Record immediately after dropping off</p>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">RPE (0-10)</label>
+                                            <input 
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={data.rpe}
+                                                onChange={(e) => updateData('rpe', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none text-2xl font-bold text-center"
+                                                placeholder="8"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">HR at Drop-Off (BPM)</label>
+                                            <input 
+                                                type="number"
+                                                value={data.hrDropOff}
+                                                onChange={(e) => updateData('hrDropOff', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., 165"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">HR at 60s Post (BPM)</label>
+                                            <input 
+                                                type="number"
+                                                value={data.hr60s}
+                                                onChange={(e) => updateData('hr60s', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., 145"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">Time to BR ≤30 (seconds)</label>
+                                            <input 
+                                                type="number"
+                                                value={data.recoveryTime}
+                                                onChange={(e) => updateData('recoveryTime', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                                placeholder="e.g., 90"
+                                            />
+                                        </div>
+                                        
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-semibold mb-2">Recovery Feel</label>
+                                            <select 
+                                                value={data.recoveryFeel}
+                                                onChange={(e) => updateData('recoveryFeel', e.target.value)}
+                                                className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                                            >
+                                                <option value="">Select...</option>
+                                                <option value="calm">Calm</option>
+                                                <option value="dizzy">Dizzy</option>
+                                                <option value="shaky">Shaky</option>
+                                                <option value="fine">Fine</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    {data.hrDropOff && data.hr60s && (
+                                        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                                            <p className="text-lg"><strong>HRR₆₀:</strong> {hrr60} BPM</p>
+                                            <p className="text-sm text-gray-600 mt-2">
+                                                {hrr60 >= 18 ? '✅ Strong recovery' : hrr60 >= 12 ? '⚠️ Moderate recovery' : '❌ Slow recovery - needs longer rest'}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {step === 4 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">Crux Window Analysis</h2>
+                                    <p className="text-gray-600">Review audio/video and count breathing expressions</p>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Raw BR (60-sec crux window)</label>
+                                        <input 
+                                            type="number"
+                                            value={data.rawBR}
+                                            onChange={(e) => updateData('rawBR', e.target.value)}
+                                            className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:outline-none text-2xl font-bold"
+                                            placeholder="e.g., 42"
+                                        />
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={calculateAdjustments}
+                                        className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition"
+                                    >
+                                        Calculate Adjustments
+                                    </button>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                                            <div className="flex justify-between">
+                                                <span>Breath Holds (+2 to +10 each)</span>
+                                                <span className="font-bold">+{data.bhAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                                            <div className="flex justify-between">
+                                                <span>Grunts (+3 each)</span>
+                                                <span className="font-bold">+{data.gruntAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                                            <div className="flex justify-between">
+                                                <span>Screams (+5 each)</span>
+                                                <span className="font-bold">+{data.screamAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                                            <div className="flex justify-between">
+                                                <span>Nasal Inhales (+2 each)</span>
+                                                <span className="font-bold">+{data.nasalAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                                            <div className="flex justify-between">
+                                                <span>Yes/Woohoo (+1.5 each)</span>
+                                                <span className="font-bold">+{data.yesAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-500">
+                                            <div className="flex justify-between">
+                                                <span>Sighs (-0.5 each)</span>
+                                                <span className="font-bold">{data.sighAdjustment.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-indigo-100 p-6 rounded-xl border-2 border-indigo-500">
+                                        <div className="text-center">
+                                            <p className="text-sm text-gray-600 mb-2">Total Adjustment (max +15)</p>
+                                            <p className="text-4xl font-bold text-indigo-900">+{totalAdjustment.toFixed(1)} BPM</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 5 && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold text-indigo-900">Assessment Results</h2>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-xl">
+                                            <p className="text-sm opacity-80 mb-2">Raw BR</p>
+                                            <p className="text-5xl font-bold">{data.rawBR || '--'}</p>
+                                            <p className="text-sm mt-2">breaths/min</p>
+                                        </div>
+                                        
+                                        <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-xl">
+                                            <p className="text-sm opacity-80 mb-2">Effective BR</p>
+                                            <p className="text-5xl font-bold">{effectiveBR.toFixed(1) || '--'}</p>
+                                            <p className="text-sm mt-2">breaths/min (adjusted)</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {data.rawBR && (
+                                        <>
+                                            <div className={`p-6 rounded-xl text-white ${getZone(effectiveBR).color}`}>
+                                                <div className="flex items-center just
+                                

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PranaClimb Energy-Cost Calculator v1.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #ffffff;
+      --surface:  #f9fafb;
+      --surfaceAlt: #e5e7eb;
+      --b1:       #aaff00;
+      --b2:       #89cff0;
+      --title:    #ff00ff;
+      --text:     #111111;
+      --textMid:  #444444;
+      --textMuted:#888888;
+      --accent:   #f97316;
+      --accentBg: #fff7ed;
+      --green:    #16a34a;
+      --greenBg:  #f0fdf4;
+      --red:      #dc2626;
+      --redBg:    #fef2f2;
+      --yellow:   #ca8a04;
+      --yellowBg: #fefce8;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+    /* Range input */
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px; border-radius: 2px;
+      background: var(--surfaceAlt); outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--title); cursor: pointer; border: 2px solid #fff;
+      box-shadow: 0 0 8px #ff00ff50;
+    }
+
+    input[type=text], input[type=number], textarea {
+      background: var(--surface);
+      border: 1.5px solid var(--b2);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'DM Mono', monospace;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus { border-color: var(--title) !important; }
+    textarea { resize: vertical; line-height: 1.6; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+    @keyframes glowLime { 0%,100% { box-shadow: 0 0 16px #aaff0040; } 50% { box-shadow: 0 0 32px #aaff0070; } }
+
+    /* HEADER */
+    #header {
+      background: var(--bg);
+      border-bottom: 3px solid var(--b1);
+      padding: 20px 24px 0;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 16px #aaff0030;
+    }
+    .header-inner { max-width: 600px; margin: 0 auto; }
+    .brand-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px; }
+    .brand-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 34px; letter-spacing: 0.06em; line-height: 1;
+      color: var(--title);
+    }
+    .brand-sub { font-size: 11px; color: var(--textMuted); letter-spacing: 0.2em; font-weight: 700; }
+    .brand-note { margin-left: auto; font-size: 10px; color: var(--textMuted); letter-spacing: 0.1em; font-family: 'DM Mono', monospace; text-align: right; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 2px; }
+    .tab-btn {
+      padding: 10px 20px; border: none; background: none;
+      font-weight: 700; font-size: 12px; letter-spacing: 0.1em;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s; color: var(--textMuted);
+    }
+    .tab-btn.active { color: var(--title); border-bottom-color: var(--title); }
+
+    .info-link {
+      margin-left: auto; padding: 6px 14px;
+      border: 1.5px solid var(--b2); border-radius: 20px;
+      background: #eff9ff; color: #0369a1;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-decoration: none; font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 5px;
+      transition: all 0.2s; white-space: nowrap; align-self: center;
+      margin-bottom: 4px;
+    }
+    .info-link:hover { background: var(--b2); color: #fff; border-color: var(--b2); }
+
+    /* MAIN */
+    .main { max-width: 600px; margin: 0 auto; padding: 24px 16px; }
+
+    /* SECTION HEADER */
+    .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .step-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--title);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', cursive; font-size: 16px; color: #fff;
+      flex-shrink: 0;
+    }
+    .section-title { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
+
+    label.field-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      color: var(--textMid); text-transform: uppercase;
+      font-family: 'DM Sans', sans-serif; margin-bottom: 6px; display: block;
+    }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .input-wrap { position: relative; }
+    .input-suffix {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--textMuted); font-size: 12px; pointer-events: none;
+    }
+    .input-wrap input { padding-right: 40px; }
+
+    /* STYLE BUTTONS */
+    .style-row { display: flex; gap: 8px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border-radius: 8px;
+      border: 2px solid var(--surfaceAlt);
+      background: var(--surface); color: var(--textMuted);
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+    .style-btn.active { border-color: var(--b1); background: #f5ffe0; color: #4d7a00; }
+
+    /* ZONE BUTTONS */
+    .zone-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .zone-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 10px;
+      border: 2px solid var(--surfaceAlt);
+      background: var(--surface); cursor: pointer;
+      transition: all 0.18s; text-align: left; width: 100%;
+    }
+    .zone-emoji { font-size: 22px; }
+    .zone-info { flex: 1; }
+    .zone-name { font-weight: 700; font-size: 14px; color: var(--textMid); font-family: 'DM Sans', sans-serif; }
+    .zone-meta { font-size: 11px; color: var(--textMuted); font-family: 'DM Mono', monospace; margin-left: 8px; }
+    .zone-desc { font-size: 11px; color: var(--textMuted); margin-top: 2px; }
+    .zone-kcal { text-align: right; font-family: 'Bebas Neue', cursive; font-size: 20px; color: var(--textMuted); letter-spacing: 0.05em; }
+    .zone-unit { font-size: 9px; color: var(--textMuted); letter-spacing: 0.1em; }
+
+    /* SLIDER ROW */
+    .slider-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+    .slider-val { font-family: 'Bebas Neue', cursive; font-size: 20px; color: var(--title); letter-spacing: 0.05em; }
+    .slider-bounds { display: flex; justify-content: space-between; margin-top: 4px; }
+    .slider-bounds span { font-size: 10px; color: var(--textMuted); font-family: 'DM Mono', monospace; }
+
+    /* MODIFIER BOXES */
+    .mod-box {
+      background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px;
+    }
+    .mod-box-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; margin-bottom: 14px; font-family: 'DM Sans', sans-serif; }
+    .mod-row { margin-bottom: 12px; }
+    .mod-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .mod-label { font-size: 13px; color: var(--text); font-family: 'DM Sans', sans-serif; }
+    .mod-note { font-size: 11px; color: var(--textMuted); font-family: 'DM Sans', sans-serif; }
+    .mod-opts { display: flex; gap: 6px; }
+    .mod-opt {
+      flex: 1; padding: 6px 4px; border-radius: 6px;
+      border: 2px solid var(--surfaceAlt);
+      background: var(--surface); color: var(--textMuted);
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; font-family: 'DM Mono', monospace;
+    }
+
+    /* RESULT PANEL */
+    .result-panel {
+      background: var(--bg);
+      border: 2px solid var(--b1);
+      border-radius: 16px; padding: 24px; margin-bottom: 16px;
+      animation: glowLime 3s ease-in-out infinite;
+    }
+    .result-label { font-size: 10px; color: var(--textMuted); letter-spacing: 0.12em; margin-bottom: 4px; font-weight: 700; }
+    .result-divider { border-top: 1.5px solid var(--b2); padding-top: 16px; margin-bottom: 16px; }
+    .result-rate { font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--accent); letter-spacing: 0.04em; line-height: 1; }
+    .result-total { font-family: 'Bebas Neue', cursive; font-size: 52px; color: var(--text); letter-spacing: 0.02em; line-height: 1; }
+    .result-unit { font-size: 16px; color: var(--textMuted); margin-left: 4px; }
+    .result-formula { font-size: 11px; color: var(--textMuted); font-family: 'DM Mono', monospace; margin-bottom: 16px; }
+    .result-flex { display: flex; justify-content: space-between; align-items: flex-end; }
+
+    .log-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 10px;
+      background: var(--title); color: #fff;
+      font-family: 'Bebas Neue', cursive; font-size: 18px; letter-spacing: 0.12em;
+      cursor: pointer; transition: all 0.25s ease;
+      box-shadow: 0 4px 16px #ff00ff40;
+    }
+    .log-btn.added { background: var(--green); animation: pulse 0.3s ease; }
+
+    .reset-btn {
+      width: 100%; padding: 10px; border-radius: 10px;
+      border: 1.5px solid var(--surfaceAlt); background: none;
+      color: var(--textMuted); font-family: 'Bebas Neue', cursive;
+      font-size: 15px; letter-spacing: 0.12em; cursor: pointer;
+      transition: all 0.2s; margin-top: 8px;
+    }
+    .reset-btn:hover { border-color: var(--red); color: var(--red); background: #fef2f2; }
+
+    .footer-note { font-size: 10px; color: var(--textMuted); text-align: center; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; line-height: 1.7; }
+
+    /* SESSION TAB */
+    .session-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .add-burn-btn {
+      padding: 6px 14px; border-radius: 6px;
+      border: 1.5px solid var(--title); background: none;
+      color: var(--title); font-size: 11px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif;
+    }
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+      background: var(--surface); border-radius: 12px;
+      border: 1.5px dashed var(--b2);
+    }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; }
+    .empty-text { color: var(--textMuted); font-size: 13px; line-height: 1.6; }
+
+    /* BURN CARD */
+    .burn-card {
+      background: var(--surface); border: 1.5px solid var(--b2);
+      border-radius: 10px; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px; animation: slideIn 0.2s ease;
+    }
+    .burn-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .burn-num { font-size: 12px; color: var(--textMuted); font-family: 'DM Mono', monospace; }
+    .burn-zone-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 20px;
+      font-weight: 700; font-family: 'DM Sans', sans-serif;
+    }
+    .burn-style { font-size: 10px; color: var(--textMuted); }
+    .burn-stats { display: flex; gap: 16px; }
+    .burn-dur { font-size: 14px; color: var(--text); font-family: 'DM Mono', monospace; }
+    .burn-kcal { font-size: 14px; font-weight: 700; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .burn-rate { font-size: 12px; color: var(--textMuted); font-family: 'DM Mono', monospace; }
+    .burn-muted { color: var(--textMuted); font-size: 11px; font-weight: 400; }
+    .remove-btn {
+      background: none; border: none; color: var(--textMuted);
+      cursor: pointer; font-size: 18px; line-height: 1; padding: 4px;
+      border-radius: 4px; transition: color 0.15s;
+    }
+    .remove-btn:hover { color: var(--red); }
+
+    /* TOTALS */
+    .totals-panel {
+      background: var(--bg); border: 2px solid var(--b1);
+      border-radius: 16px; padding: 20px; margin-bottom: 24px;
+      animation: glowLime 3s ease-in-out infinite;
+    }
+    .totals-title { font-family: 'Bebas Neue', cursive; font-size: 13px; letter-spacing: 0.2em; color: var(--title); margin-bottom: 16px; }
+    .stat-label { font-size: 9px; color: var(--textMuted); letter-spacing: 0.15em; font-weight: 700; margin-bottom: 4px; font-family: 'DM Sans', sans-serif; text-align: center; }
+    .stat-val { font-family: 'Bebas Neue', cursive; letter-spacing: 0.04em; line-height: 1; text-align: center; }
+    .stat-unit { font-size: 10px; color: var(--textMuted); font-family: 'DM Mono', monospace; text-align: center; }
+
+    /* RECOVERY */
+    .recov-section { margin-bottom: 24px; }
+    .recov-quality { display: flex; gap: 8px; margin-bottom: 16px; }
+    .rq-btn {
+      flex: 1; padding: 8px 4px; border-radius: 8px;
+      border: 2px solid var(--surfaceAlt); background: var(--surface);
+      color: var(--textMuted); font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+
+    .page-footer {
+      font-size: 10px; color: var(--textMuted); text-align: center;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.08em;
+      border-top: 2px solid var(--b1); padding-top: 16px; line-height: 1.8;
+    }
+
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mono { font-family: 'DM Mono', monospace; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div>
+        <div class="brand-title">PRANACLIMB</div>
+        <div class="brand-sub">ENERGY-COST CALCULATOR · v1.0</div>
+      </div>
+      <div class="brand-note">BASELINE ~10–11 kcal/min @ 70kg</div>
+    </div>
+    <div class="tabs" style="display:flex;align-items:flex-end;">
+      <button class="tab-btn active" onclick="switchTab('calc', this)">⚡ CALCULATOR</button>
+      <button class="tab-btn" id="session-tab-btn" onclick="switchTab('session', this)">📋 SESSION LOG</button>
+      <a class="info-link" href="https://pranaclimb.github.io/Energy-Calculator-Info/" target="_blank">ℹ️ INFO GUIDE</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══════════════ CALCULATOR TAB ══════════════ -->
+  <div id="tab-calc">
+
+    <!-- Step 1 -->
+    <div class="mb-24">
+      <div class="section-head">
+        <div class="step-circle">1</div>
+        <div class="section-title">ATHLETE METRICS</div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label class="field-label">Body Mass (kg)</label>
+          <div class="input-wrap">
+            <input type="number" id="mass" value="70" min="40" max="150" oninput="calculate()" />
+            <span class="input-suffix">kg</span>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Duration (min)</label>
+          <div class="input-wrap">
+            <input type="number" id="duration" value="15" min="1" max="120" oninput="calculate()" />
+            <span class="input-suffix">min</span>
+          </div>
+        </div>
+      </div>
+      <label class="field-label">Climbing Style</label>
+      <div class="style-row" id="style-row">
+        <button class="style-btn active" onclick="selectStyle(this)">Sport</button>
+        <button class="style-btn" onclick="selectStyle(this)">Boulder</button>
+        <button class="style-btn" onclick="selectStyle(this)">Trad</button>
+        <button class="style-btn" onclick="selectStyle(this)">Big Wall</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="mb-24">
+      <div class="section-head">
+        <div class="step-circle">2</div>
+        <div class="section-title">EFFORT ZONE</div>
+      </div>
+      <div class="zone-list" id="zone-list">
+        <button class="zone-btn" data-zone="0" onclick="selectZone(this)" style="border-color:#16a34a; background:#f0fdf4;">
+          <span class="zone-emoji">🟢</span>
+          <div class="zone-info">
+            <div style="display:flex;align-items:center;">
+              <span class="zone-name" style="color:#16a34a;">Below CP</span>
+              <span class="zone-meta">BR &lt; 45 BPM</span>
+              <span class="zone-meta">RPE ≤ 7</span>
+            </div>
+            <div class="zone-desc">Aerobic sustainable</div>
+          </div>
+          <div>
+            <div class="zone-kcal" style="color:#16a34a;">9–10</div>
+            <div class="zone-unit">kcal/min</div>
+          </div>
+        </button>
+        <button class="zone-btn" data-zone="1" onclick="selectZone(this)">
+          <span class="zone-emoji">🟡</span>
+          <div class="zone-info">
+            <div style="display:flex;align-items:center;">
+              <span class="zone-name">Grey Zone</span>
+              <span class="zone-meta">BR 45–55 BPM</span>
+              <span class="zone-meta">RPE 8–9</span>
+            </div>
+            <div class="zone-desc">Borderline sustainable</div>
+          </div>
+          <div>
+            <div class="zone-kcal">10–12</div>
+            <div class="zone-unit">kcal/min</div>
+          </div>
+        </button>
+        <button class="zone-btn" data-zone="2" onclick="selectZone(this)">
+          <span class="zone-emoji">🔴</span>
+          <div class="zone-info">
+            <div style="display:flex;align-items:center;">
+              <span class="zone-name">Above RCP</span>
+              <span class="zone-meta">BR &gt; 55 BPM</span>
+              <span class="zone-meta">RPE ≥ 9.5</span>
+            </div>
+            <div class="zone-desc">Severe domain / fast drain</div>
+          </div>
+          <div>
+            <div class="zone-kcal">12–16</div>
+            <div class="zone-unit">kcal/min</div>
+          </div>
+        </button>
+      </div>
+
+      <div>
+        <div class="slider-row">
+          <label class="field-label" style="margin-bottom:0;">Base kcal/min for this effort</label>
+          <span class="slider-val" id="slider-display">11</span>
+        </div>
+        <input type="range" id="base-slider" min="10" max="12" step="0.5" value="11" oninput="onSlider()" />
+        <div class="slider-bounds">
+          <span id="slider-min">10 kcal/min</span>
+          <span id="slider-max">12+ kcal/min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="mb-24">
+      <div class="section-head">
+        <div class="step-circle">3</div>
+        <div class="section-title">MODIFIERS</div>
+      </div>
+
+      <!-- Intensity -->
+      <div class="mod-box" style="border:1.5px solid var(--b2);">
+        <div class="mod-box-title" style="color:var(--red);">▲ INTENSITY COST</div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Steep Terrain &gt;100°</span>
+            <span class="mod-note">Overhang raises anaerobic cost</span>
+          </div>
+          <div class="mod-opts" data-mod="steep">
+            <button class="mod-opt active-base" onclick="selectMod(this,'steep',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'steep',1.2)">×1.2</button>
+            <button class="mod-opt" onclick="selectMod(this,'steep',1.3)">×1.3</button>
+            <button class="mod-opt" onclick="selectMod(this,'steep',1.4)">×1.4</button>
+          </div>
+        </div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Poor Grip (Crimps/Pockets)</span>
+            <span class="mod-note">Higher forearm O₂ demand</span>
+          </div>
+          <div class="mod-opts" data-mod="grip">
+            <button class="mod-opt active-base" onclick="selectMod(this,'grip',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'grip',1.1)">×1.1</button>
+            <button class="mod-opt" onclick="selectMod(this,'grip',1.2)">×1.2</button>
+            <button class="mod-opt" onclick="selectMod(this,'grip',1.3)">×1.3</button>
+          </div>
+        </div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Inefficient Movement</span>
+            <span class="mod-note">Rigid shoulders = higher BR</span>
+          </div>
+          <div class="mod-opts" data-mod="tension">
+            <button class="mod-opt active-base" onclick="selectMod(this,'tension',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'tension',1.1)">×1.1</button>
+            <button class="mod-opt" onclick="selectMod(this,'tension',1.2)">×1.2</button>
+            <button class="mod-opt" onclick="selectMod(this,'tension',1.3)">×1.3</button>
+          </div>
+        </div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Fear / Anxiety</span>
+            <span class="mod-note">HR rises beyond metabolic demand</span>
+          </div>
+          <div class="mod-opts" data-mod="fear">
+            <button class="mod-opt active-base" onclick="selectMod(this,'fear',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'fear',1.1)">×1.1</button>
+            <button class="mod-opt" onclick="selectMod(this,'fear',1.2)">×1.2</button>
+            <button class="mod-opt" onclick="selectMod(this,'fear',1.4)">×1.4</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Efficiency -->
+      <div class="mod-box" style="border:1.5px solid var(--b1);">
+        <div class="mod-box-title" style="color:var(--green);">▼ EFFICIENCY BONUS</div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Flow State</span>
+            <span class="mod-note">Smooth movement efficiency</span>
+          </div>
+          <div class="mod-opts" data-mod="flow">
+            <button class="mod-opt active-base" onclick="selectMod(this,'flow',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'flow',0.9)">×0.9</button>
+            <button class="mod-opt" onclick="selectMod(this,'flow',0.85)">×0.85</button>
+          </div>
+        </div>
+
+        <div class="mod-row">
+          <div class="mod-header">
+            <span class="mod-label">Open-Hand Grip</span>
+            <span class="mod-note">Reduces forearm tension</span>
+          </div>
+          <div class="mod-opts" data-mod="openhand">
+            <button class="mod-opt active-base" onclick="selectMod(this,'openhand',1.0)">×1.0</button>
+            <button class="mod-opt" onclick="selectMod(this,'openhand',0.95)">×0.95</button>
+            <button class="mod-opt" onclick="selectMod(this,'openhand',0.9)">×0.9</button>
+            <button class="mod-opt" onclick="selectMod(this,'openhand',0.85)">×0.85</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 Result -->
+    <div class="result-panel mb-16">
+      <div style="font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:0.2em;color:var(--title);margin-bottom:16px;">⚡ STEP 4 — ENERGY OUTPUT</div>
+      <div class="grid-2 mb-16">
+        <div>
+          <div class="result-label">MASS RATIO</div>
+          <div class="mono" style="font-size:22px;color:var(--textMid);" id="res-mass-ratio">1.00</div>
+        </div>
+        <div>
+          <div class="result-label">MODIFIER STACK</div>
+          <div class="mono" style="font-size:22px;color:var(--textMid);" id="res-modifier">×1.00</div>
+        </div>
+      </div>
+      <div class="result-divider result-flex">
+        <div>
+          <div class="result-label">RATE</div>
+          <div class="result-rate" id="res-rate">11.0<span class="result-unit">kcal/min</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="result-label">TOTAL · <span id="res-dur-label">15</span> MIN</div>
+          <div class="result-total" id="res-total">165<span class="result-unit">kcal</span></div>
+        </div>
+      </div>
+      <div class="result-formula" id="res-formula">11 × 1.00 × 1.00 = 11.00 kcal/min × 15min</div>
+      <button class="log-btn" id="log-btn" onclick="logBurn()">＋ LOG TO SESSION</button>
+      <button class="reset-btn" onclick="resetCalculator()">↺ RESET</button>
+    </div>
+
+    <div class="footer-note">
+      Not a medical calorie counter — a climbing-specific metabolic proxy.<br />
+      Best used to track <em>relative change</em> in energy cost, pacing &amp; efficiency over time.
+    </div>
+  </div>
+
+  <!-- ══════════════ SESSION TAB ══════════════ -->
+  <div id="tab-session" class="hidden">
+
+    <!-- Athlete Info -->
+    <div class="mb-24">
+      <div class="section-title mb-12">SESSION INFO</div>
+      <div class="grid-2">
+        <div>
+          <label class="field-label">Athlete Name</label>
+          <input type="text" id="athlete-name" placeholder="Name" />
+        </div>
+        <div>
+          <label class="field-label">Route / Problem</label>
+          <input type="text" id="route-name" placeholder="Route name" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Burn Log -->
+    <div class="mb-24">
+      <div class="session-head">
+        <div class="section-title">BURN LOG</div>
+        <button class="add-burn-btn" onclick="switchTab('calc', document.querySelector('.tab-btn'))">＋ ADD BURN</button>
+      </div>
+      <div id="burn-list">
+        <div class="empty-state" id="burn-empty">
+          <div class="empty-icon">🧗</div>
+          <div class="empty-text">No burns logged yet.<br />Use the Calculator tab to calculate &amp; log a burn.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Totals -->
+    <div class="totals-panel hidden" id="totals-panel">
+      <div class="totals-title">📊 SESSION TOTALS</div>
+      <div class="grid-3">
+        <div>
+          <div class="stat-label">CLIMBS</div>
+          <div class="stat-val" id="tot-climbs" style="font-size:28px;color:var(--text);">0</div>
+        </div>
+        <div>
+          <div class="stat-label">TOTAL TIME</div>
+          <div class="stat-val" id="tot-time" style="font-size:28px;color:var(--text);">0</div>
+          <div class="stat-unit">min</div>
+        </div>
+        <div>
+          <div class="stat-label">TOTAL KCAL</div>
+          <div class="stat-val" id="tot-kcal" style="font-size:36px;color:var(--title);">0</div>
+          <div class="stat-unit">kcal</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recovery -->
+    <div class="recov-section">
+      <div class="section-title mb-16">W′BAL RECOVERY</div>
+      <div class="mb-12">
+        <label class="field-label">HRR₆₀ — Heart Rate Recovery (BPM drop in 60s)</label>
+        <div class="input-wrap">
+          <input type="number" id="hrr60" placeholder="e.g. 25" style="padding-right:52px;" />
+          <span class="input-suffix">BPM</span>
+        </div>
+      </div>
+      <label class="field-label">Recovery Quality</label>
+      <div class="recov-quality" id="rq-row">
+        <button class="rq-btn" onclick="selectRQ(this,'#dc2626')" style="border-color:#e5e7eb;">Low</button>
+        <button class="rq-btn" onclick="selectRQ(this,'#ca8a04')" style="border-color:#e5e7eb;">Mod</button>
+        <button class="rq-btn active-rq" onclick="selectRQ(this,'#16a34a')" style="border-color:#16a34a;background:#16a34a15;color:#16a34a;">Good</button>
+        <button class="rq-btn" onclick="selectRQ(this,'#0284c7')" style="border-color:#e5e7eb;">Excellent</button>
+      </div>
+      <label class="field-label">Notes / Reflections</label>
+      <textarea id="notes" rows="4" placeholder="How did it feel? Movement quality, pacing, recovery..."></textarea>
+    </div>
+
+    <div class="page-footer">
+      PRANACLIMB ENERGY-COST CALCULATOR · v1.0 MINIMAL EDITION<br />
+      DESIGNED FOR COACHES &amp; ATHLETES · NOT A CLINICAL CALORIE COUNTER<br />
+      © PRANACLIMB LTD. ALL RIGHTS RESERVED.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── State ──────────────────────────────────────────
+  const ZONES = [
+    { label: 'Below CP',   emoji: '🟢', br: '< 45 BPM',  rpe: '≤ 7',   min: 9,  max: 10, color: '#16a34a', bg: '#f0fdf4' },
+    { label: 'Grey Zone',  emoji: '🟡', br: '45–55 BPM', rpe: '8–9',   min: 10, max: 12, color: '#ca8a04', bg: '#fefce8' },
+    { label: 'Above RCP',  emoji: '🔴', br: '> 55 BPM',  rpe: '≥ 9.5', min: 12, max: 16, color: '#dc2626', bg: '#fef2f2' },
+  ];
+
+  let state = {
+    zoneIdx: 0,
+    baseKcal: 9.5,
+    mods: { steep: 1.0, grip: 1.0, tension: 1.0, fear: 1.0, flow: 1.0, openhand: 1.0 },
+    burns: [],
+    style: 'Sport',
+  };
+
+  // Init zone 0 selected
+  selectZone(document.querySelector('[data-zone="0"]'));
+
+  // ── Tab switching ───────────────────────────────────
+  function switchTab(name, btn) {
+    document.getElementById('tab-calc').classList.toggle('hidden', name !== 'calc');
+    document.getElementById('tab-session').classList.toggle('hidden', name !== 'session');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    // find and activate the right tab btn
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      if ((name === 'calc' && b.textContent.includes('CALCULATOR')) ||
+          (name === 'session' && b.textContent.includes('SESSION'))) {
+        b.classList.add('active');
+      }
+    });
+  }
+
+  // ── Style selector ──────────────────────────────────
+  function selectStyle(btn) {
+    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.style = btn.textContent;
+  }
+
+  // ── Zone selector ───────────────────────────────────
+  function selectZone(btn) {
+    const idx = parseInt(btn.dataset.zone);
+    state.zoneIdx = idx;
+    const z = ZONES[idx];
+    // Update buttons
+    document.querySelectorAll('.zone-btn').forEach(b => {
+      const zi = parseInt(b.dataset.zone);
+      const zz = ZONES[zi];
+      if (zi === idx) {
+        b.style.borderColor = zz.color;
+        b.style.background = zz.bg;
+        b.querySelector('.zone-name').style.color = zz.color;
+        b.querySelector('.zone-kcal').style.color = zz.color;
+      } else {
+        b.style.borderColor = '#e5e7eb';
+        b.style.background = '#f9fafb';
+        b.querySelector('.zone-name').style.color = '#444';
+        b.querySelector('.zone-kcal').style.color = '#888';
+      }
+    });
+    // Update slider
+    const mid = (z.min + z.max) / 2;
+    state.baseKcal = mid;
+    const slider = document.getElementById('base-slider');
+    slider.min = z.min; slider.max = z.max; slider.step = 0.5; slider.value = mid;
+    document.getElementById('slider-display').textContent = mid;
+    document.getElementById('slider-min').textContent = z.min + ' kcal/min';
+    document.getElementById('slider-max').textContent = z.max + '+ kcal/min';
+    calculate();
+  }
+
+  function onSlider() {
+    state.baseKcal = parseFloat(document.getElementById('base-slider').value);
+    document.getElementById('slider-display').textContent = state.baseKcal;
+    calculate();
+  }
+
+  // ── Modifier selector ───────────────────────────────
+  function selectMod(btn, mod, val) {
+    state.mods[mod] = val;
+    const container = btn.parentElement;
+    container.querySelectorAll('.mod-opt').forEach(b => {
+      const isBonus = parseFloat(b.textContent.replace('×','')) < 1.0;
+      const isBase  = parseFloat(b.textContent.replace('×','')) === 1.0;
+      b.style.border = '2px solid #e5e7eb';
+      b.style.background = '#f9fafb';
+      b.style.color = '#888';
+    });
+    const v = parseFloat(btn.textContent.replace('×',''));
+    const isBonus = v < 1.0;
+    const isBase  = v === 1.0;
+    btn.style.border = '2px solid ' + (isBonus ? '#aaff00' : isBase ? '#89cff0' : '#f97316');
+    btn.style.background = isBonus ? '#f0fdf4' : isBase ? '#f9fafb' : '#fff7ed';
+    btn.style.color = isBonus ? '#16a34a' : isBase ? '#444' : '#f97316';
+    calculate();
+  }
+
+  // ── Calculate ───────────────────────────────────────
+  function calculate() {
+    const mass = parseFloat(document.getElementById('mass').value) || 70;
+    const dur  = parseFloat(document.getElementById('duration').value) || 15;
+    const massRatio = mass / 70;
+    const totalMod = Object.values(state.mods).reduce((a, b) => a * b, 1);
+    const rate = state.baseKcal * massRatio * totalMod;
+    const total = rate * dur;
+
+    document.getElementById('res-mass-ratio').textContent = massRatio.toFixed(2);
+    const modEl = document.getElementById('res-modifier');
+    modEl.textContent = '×' + totalMod.toFixed(2);
+    modEl.style.color = totalMod > 1 ? '#dc2626' : totalMod < 1 ? '#16a34a' : '#444';
+    document.getElementById('res-rate').innerHTML = rate.toFixed(1) + '<span class="result-unit">kcal/min</span>';
+    document.getElementById('res-dur-label').textContent = dur;
+    document.getElementById('res-total').innerHTML = total.toFixed(0) + '<span class="result-unit">kcal</span>';
+    document.getElementById('res-formula').textContent =
+      state.baseKcal + ' × ' + massRatio.toFixed(2) + ' × ' + totalMod.toFixed(2) +
+      ' = ' + rate.toFixed(2) + ' kcal/min × ' + dur + 'min';
+  }
+
+  // ── Log Burn ────────────────────────────────────────
+  function logBurn() {
+    const mass = parseFloat(document.getElementById('mass').value) || 70;
+    const dur  = parseFloat(document.getElementById('duration').value) || 15;
+    const massRatio = mass / 70;
+    const totalMod = Object.values(state.mods).reduce((a, b) => a * b, 1);
+    const rate = state.baseKcal * massRatio * totalMod;
+    const total = rate * dur;
+    const z = ZONES[state.zoneIdx];
+
+    state.burns.push({ zone: z, zoneIdx: state.zoneIdx, style: state.style, duration: dur, kcalPerMin: rate, totalKcal: total, id: Date.now() });
+
+    const btn = document.getElementById('log-btn');
+    btn.textContent = '✓ BURN LOGGED TO SESSION';
+    btn.classList.add('added');
+    setTimeout(() => { btn.textContent = '＋ LOG TO SESSION'; btn.classList.remove('added'); }, 1200);
+
+    renderBurnList();
+    updateSessionTabLabel();
+  }
+
+  function removeBurn(id) {
+    state.burns = state.burns.filter(b => b.id !== id);
+    renderBurnList();
+    updateSessionTabLabel();
+  }
+
+  function renderBurnList() {
+    const list = document.getElementById('burn-list');
+    const empty = document.getElementById('burn-empty');
+    const totals = document.getElementById('totals-panel');
+
+    if (state.burns.length === 0) {
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.classList.remove('hidden');
+      totals.classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    list.innerHTML = '';
+
+    state.burns.forEach((burn, i) => {
+      const card = document.createElement('div');
+      card.className = 'burn-card';
+      card.innerHTML = `
+        <div>
+          <div class="burn-meta">
+            <span class="burn-num">BURN ${i + 1}</span>
+            <span class="burn-zone-badge" style="background:${burn.zone.bg};color:${burn.zone.color};border:1px solid ${burn.zone.color}40;">
+              ${burn.zone.emoji} ${burn.zone.label}
+            </span>
+            <span class="burn-style">${burn.style}</span>
+          </div>
+          <div class="burn-stats">
+            <span class="burn-dur">${burn.duration} <span style="color:var(--textMuted);font-size:11px;">min</span></span>
+            <span class="burn-kcal">${burn.totalKcal.toFixed(0)} <span class="burn-muted">kcal</span></span>
+            <span class="burn-rate">${burn.kcalPerMin.toFixed(1)} kcal/min</span>
+          </div>
+        </div>
+        <button class="remove-btn" onclick="removeBurn(${burn.id})">×</button>
+      `;
+      list.appendChild(card);
+    });
+
+    // Totals
+    totals.classList.remove('hidden');
+    const totalTime = state.burns.reduce((s, b) => s + b.duration, 0);
+    const totalKcal = state.burns.reduce((s, b) => s + b.totalKcal, 0);
+    document.getElementById('tot-climbs').textContent = state.burns.length;
+    document.getElementById('tot-time').textContent = totalTime;
+    document.getElementById('tot-kcal').textContent = totalKcal.toFixed(0);
+  }
+
+  function updateSessionTabLabel() {
+    const btn = document.getElementById('session-tab-btn');
+    btn.textContent = state.burns.length
+      ? `📋 SESSION LOG (${state.burns.length})`
+      : '📋 SESSION LOG';
+  }
+
+  // ── Recovery Quality ────────────────────────────────
+  function selectRQ(btn, col) {
+    document.querySelectorAll('.rq-btn').forEach(b => {
+      b.style.borderColor = '#e5e7eb';
+      b.style.background = 'var(--surface)';
+      b.style.color = 'var(--textMuted)';
+    });
+    btn.style.borderColor = col;
+    btn.style.background = col + '15';
+    btn.style.color = col;
+  }
+
+  // Initial calc
+  calculate();
+
+  // ── Reset Calculator ────────────────────────────────
+  function resetCalculator() {
+    // Reset inputs
+    document.getElementById('mass').value = 70;
+    document.getElementById('duration').value = 15;
+
+    // Reset style
+    document.querySelectorAll('.style-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === 0);
+    });
+    state.style = 'Sport';
+
+    // Reset zone to 0
+    selectZone(document.querySelector('[data-zone="0"]'));
+
+    // Reset all mod buttons to ×1.0
+    Object.keys(state.mods).forEach(mod => {
+      state.mods[mod] = 1.0;
+      const container = document.querySelector(`[data-mod="${mod}"]`);
+      if (container) {
+        container.querySelectorAll('.mod-opt').forEach(b => {
+          b.style.border = '2px solid #e5e7eb';
+          b.style.background = '#f9fafb';
+          b.style.color = '#888';
+        });
+        const firstBtn = container.querySelector('.mod-opt');
+        if (firstBtn) {
+          firstBtn.style.border = '2px solid #89cff0';
+          firstBtn.style.background = '#f9fafb';
+          firstBtn.style.color = '#444';
+        }
+      }
+    });
+
+    calculate();
+  }
+</script>
+</body>
+</html>

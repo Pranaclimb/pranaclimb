@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranaclimb 12-Card Cue Grid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: #a8b2d1;
+            font-style: italic;
+        }
+
+        .zone-section {
+            margin-bottom: 60px;
+        }
+
+        .zone-header {
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .zone-1 { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+        .zone-2 { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+        .zone-3 { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
+        .zone-recovery { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .zone-header h2 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .zone-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: #a8b2d1;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .card-description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e6e6e6;
+        }
+
+        .card-metrics {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .metric-tag {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            color: #c7d2fe;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 25px;
+            padding: 50px;
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-subtitle {
+            font-size: 1.1rem;
+            color: #c7d2fe;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .modal-instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .modal-instructions h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #a8e063;
+        }
+
+        .modal-instructions p {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                padding: 30px;
+            }
+        }
+
+        .legend {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legend h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧗 Pranaclimb 12-Card Cue Grid</h1>
+            <p>Master Your Breath • Control Your Power • Climb Your Best</p>
+        </div>
+
+        <div class="legend">
+            <h3>🎯 Zone Map</h3>
+            <div class="legend-grid">
+                <div class="legend-item zone-1">Zone 1: Calm / ≤ CP</div>
+                <div class="legend-item zone-2">Zone 2: CP / Sustainable Power</div>
+                <div class="legend-item zone-3">Zone 3: RCP + Redline</div>
+                <div class="legend-item zone-recovery">Recovery: HRR₆₀ Reset</div>
+            </div>
+        </div>
+
+        <!-- ZONE 1 -->
+        <div class="zone-section">
+            <div class="zone-header zone-1">
+                <h2>🟢 ZONE 1 — CALM / ≤ CP</h2>
+                <p>Efficiency, Awareness, Control</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card" onclick="openModal(1)">
+                    <div class="card-number">1</div>
+                    <div class="card-icon">🪶</div>
+                    <div class="card-title">Silk Breath</div>
+                    <div class="card-subtitle">formerly Feather Breath</div>
+                    <div class="card-description">
+                        Soft nasal inhale–exhale, like brushing silk. Keeps you below CP, reduces hidden breath-holds, and keeps expressive spikes low.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">Below CP</span>
+                        <span class="metric-tag">Nasal Only</span>
+                        <span class="metric-tag">Low BR</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(2)">
+                    <div class="card-number">2</div>
+                    <div class="card-icon">🌊</div>
+                    <div class="card-title">Tide Rhythm</div>
+                    <div class="card-subtitle">4 in, 6 out</div>
+                    <div class="card-description">
+                        4 seconds in, 6 seconds out. Regulates CO₂, prevents early over-breathing, stabilises pacing before the crux.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">4:6 Ratio</span>
+                        <span class="metric-tag">CO₂ Control</span>
+                        <span class="metric-tag">Pre-Crux</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(3)">
+                    <div class="card-number">3</div>
+                    <div class="card-icon">🔄</div>
+                    <div class="card-title">Nasal Circuit</div>
+                    <div class="card-subtitle">continuous flow</div>
+                    <div class="card-description">
+                        Continuous nasal in/out, no breaks. Builds rhythm control and lowers ventilatory cost; expressive breath acts almost disappear.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">No Breaks</span>
+                        <span class="metric-tag">Rhythm Control</span>
+                        <span class="metric-tag">Low Cost</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZONE 2 -->
+        <div class="zone-section">
+            <div class="zone-header zone-2">
+                <h2>🟡 ZONE 2 — CP / SUSTAINABLE POWER</h2>
+                <p>Control Under Load</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card" onclick="openModal(4)">
+                    <div class="card-number">4</div>
+                    <div class="card-icon">⚓</div>
+                    <div class="card-title">Anchor Breath</div>
+                    <div class="card-subtitle">deliberate preparation</div>
+                    <div class="card-description">
+                        One to three deeper resets before intensity. Replaces chaotic micro-BHs with deliberate preparation breaths.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">1-3 Breaths</span>
+                        <span class="metric-tag">Pre-Load</span>
+                        <span class="metric-tag">No Micro-BH</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(5)">
+                    <div class="card-number">5</div>
+                    <div class="card-icon">🧭</div>
+                    <div class="card-title">Breath Compass</div>
+                    <div class="card-subtitle">diaphragm down, ribs wide</div>
+                    <div class="card-description">
+                        Diaphragm down, ribs expand wide. Stabilises posture, reduces involuntary breath holds during tension moves.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">360° Expansion</span>
+                        <span class="metric-tag">Posture Stable</span>
+                        <span class="metric-tag">Anti-BH</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(6)">
+                    <div class="card-number">6</div>
+                    <div class="card-icon">🧱</div>
+                    <div class="card-title">Stacked Bricks</div>
+                    <div class="card-subtitle">360° chest expansion</div>
+                    <div class="card-description">
+                        Chest expands 360° from low ribs upward. Increases tidal volume without increasing BR; stops shallow, high-cost breathing.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">High Tidal Vol</span>
+                        <span class="metric-tag">Low BR</span>
+                        <span class="metric-tag">Efficient</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZONE 3 -->
+        <div class="zone-section">
+            <div class="zone-header zone-3">
+                <h2>🔴 ZONE 3 — RCP + REDLINE</h2>
+                <p>Power, CO₂ Offload, Expressive Control</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card" onclick="openModal(7)">
+                    <div class="card-number">7</div>
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">Core Snap Breath</div>
+                    <div class="card-subtitle">formerly Diaphragmatic Pop</div>
+                    <div class="card-description">
+                        Sharp diaphragmatic exhale to stabilise and strike. Channels natural grunts into productive force without losing rhythm.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">Power Output</span>
+                        <span class="metric-tag">Core Stable</span>
+                        <span class="metric-tag">Grunt Control</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(8)">
+                    <div class="card-number">8</div>
+                    <div class="card-icon">🐡</div>
+                    <div class="card-title">Pufferfish Breath</div>
+                    <div class="card-subtitle">puff → pressurise → release</div>
+                    <div class="card-description">
+                        Quick puff-inhale → pressurise → long controlled exhale. Normalises CO₂ after grunts, screams, or BHs; resets rhythm mid-crux.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">CO₂ Reset</span>
+                        <span class="metric-tag">Post-Expressive</span>
+                        <span class="metric-tag">Mid-Crux</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(9)">
+                    <div class="card-number">9</div>
+                    <div class="card-icon">💨</div>
+                    <div class="card-title">Power Exhale</div>
+                    <div class="card-subtitle">pursed-lip force</div>
+                    <div class="card-description">
+                        Strong pursed-lip exhale ("tss / puff"). Controls expressive output, increases motor drive, and prevents BH stacking.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">Motor Drive</span>
+                        <span class="metric-tag">BH Prevention</span>
+                        <span class="metric-tag">Controlled Power</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECOVERY -->
+        <div class="zone-section">
+            <div class="zone-header zone-recovery">
+                <h2>💙 RECOVERY — DOWNREGULATION / HRR₆₀ RESET</h2>
+                <p>Rest, Reset, Recharge</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card" onclick="openModal(10)">
+                    <div class="card-number">10</div>
+                    <div class="card-icon">😮‍💨</div>
+                    <div class="card-title">Exhale Dump</div>
+                    <div class="card-subtitle">sigh expression</div>
+                    <div class="card-description">
+                        Let the air fall out with a full, releasing sigh. Turns involuntary "ahhs" into powerful vagal resets.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">Vagal Reset</span>
+                        <span class="metric-tag">Tension Release</span>
+                        <span class="metric-tag">Instant Relief</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(11)">
+                    <div class="card-number">11</div>
+                    <div class="card-icon">💓</div>
+                    <div class="card-title">HRR Reset</div>
+                    <div class="card-subtitle">5-6 BPM coherent</div>
+                    <div class="card-description">
+                        Slow coherent breaths @ 5–6 BPM. Accelerates HRR₆₀ and brings BR back toward 30 BPM within 60–120 s.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">5-6 BPM</span>
+                        <span class="metric-tag">HRR₆₀</span>
+                        <span class="metric-tag">Fast Recovery</span>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal(12)">
+                    <div class="card-number">12</div>
+                    <div class="card-icon">🚣</div>
+                    <div class="card-title">Rowing Breath</div>
+                    <div class="card-subtitle">in-pause-out-pause</div>
+                    <div class="card-description">
+                        Inhale–pause–exhale–pause (steady oar strokes). Rebuilds CO₂ balance, re-stabilises rhythm, and clears post-crux chaos.
+                    </div>
+                    <div class="card-metrics">
+                        <span class="metric-tag">CO₂ Rebuild</span>
+                        <span class="metric-tag">Rhythm Reset</span>
+                        <span class="metric-tag">Chaos Clear</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModal()">&times;</div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const breathData = {
+            1: {
+                icon: '🪶',
+                title: 'Silk Breath',
+                subtitle: 'formerly Feather Breath',
+                description: 'Soft nasal inhale–exhale, like brushing silk. This breath keeps you below your Critical Power (CP) threshold, minimizes hidden breath-holds, and maintains low expressive breathing spikes.',
+                howTo: 'Breathe gently through your nose only—imagine the air is as delicate as silk passing through your nostrils. Keep the breath soft, quiet, and continuous. No forcing, no tension.',
+                when: 'Use during easy terrain, warm-ups, or any time you want to stay in Zone 1 (below CP). Perfect for building awareness and control.'
+            },
+            2: {
+                icon: '🌊',
+                title: 'Tide Rhythm',
+                subtitle: '4 in, 6 out',
+                description: '4 seconds inhale, 6 seconds exhale. This rhythm regulates CO₂ levels, prevents early over-breathing, and stabilises your pacing before entering a crux section.',
+                howTo: 'Inhale through your nose for 4 seconds, then exhale slowly through your nose or mouth for 6 seconds. Think of ocean waves—steady, predictable, calming.',
+                when: 'Use before cruxes, during rest shakes, or anytime you need to calm down and prepare for harder moves ahead.'
+            },
+            3: {
+                icon: '🔄',
+                title: 'Nasal Circuit',
+                subtitle: 'continuous flow',
+                description: 'Continuous nasal breathing with no breaks or pauses. This builds rhythm control, lowers ventilatory cost, and nearly eliminates expressive breathing patterns.',
+                howTo: 'Keep breathing through your nose in a smooth, unbroken cycle. No holding, no gaps. Just continuous in and out, like a circuit loop.',
+                when: 'Ideal for sustained climbing at moderate intensity. Builds endurance and keeps you efficient.'
+            },
+            4: {
+                icon: '⚓',
+                title: 'Anchor Breath',
+                subtitle: 'deliberate preparation',
+                description: 'One to three deeper, intentional breaths before entering a high-intensity move. This replaces chaotic micro-breath-holds with purposeful preparation.',
+                howTo: 'Before a hard move, take 1-3 deep, controlled breaths. Feel grounded and ready. This "anchors" you physically and mentally.',
+                when: 'Use right before clipping, dynamic moves, or any moment requiring extra power or focus.'
+            },
+            5: {
+                icon: '🧭',
+                title: 'Breath Compass',
+                subtitle: 'diaphragm down, ribs wide',
+                description: 'Diaphragm descends, ribs expand laterally (360°). This stabilizes posture and reduces involuntary breath-holds during tense moves.',
+                howTo: 'As you inhale, feel your belly expand and your ribs widen like a compass opening. Keep your chest stable. This creates internal support.',
+                when: 'Use during technical sequences or when you feel yourself tensing up and holding your breath.'
+            },
+            6: {
+                icon: '🧱',
+                title: 'Stacked Bricks',
+                subtitle: '360° chest expansion',
+                description: 'Chest expands 360° from low ribs upward. Increases tidal volume without raising breathing rate—stops shallow, high-cost breathing.',
+                howTo: 'Imagine your ribcage is made of bricks stacking upward as you breathe. Expand front, back, and sides equally. Deep, full, efficient.',
+                when: 'Perfect for sustained power climbing at CP. Maximizes oxygen intake without spiking your breathing rate.'
+            },
+            7: {
+                icon: '⚡',
+                title: 'Core Snap Breath',
+                subtitle: 'formerly Diaphragmatic Pop',
+                description: 'Sharp, forceful diaphragmatic exhale to stabilize and generate power. Channels natural grunts into productive force output without disrupting rhythm.',
+                howTo: 'As you pull hard, snap your core and exhale sharply through your mouth. Think "TSS!" or "HAH!" This creates internal pressure and power.',
+                when: 'Use during dynamic moves, hard pulls, or any maximal effort. Replaces uncontrolled grunts with intentional power.'
+            },
+            8: {
+                icon: '🐡',
+                title: 'Pufferfish Breath',
+                subtitle: 'puff → pressurise → release',
+                description: 'Quick puff inhale, brief pressurization, then long controlled exhale. Normalizes CO₂ after grunts, screams, or breath-holds; resets rhythm mid-crux.',
+                howTo: 'Puff your cheeks lightly with a quick inhale, hold for 0.5-1 sec, then slowly release with a long exhale. Like a pufferfish deflating.',
+                when: 'Use immediately after screaming, grunting, or breath-holding. Perfect for resetting during or after a crux.'
+            },
+            9: {
+                icon: '💨',
+                title: 'Power Exhale',
+                subtitle: 'pursed-lip force',
+                description: 'Strong pursed-lip exhale ("TSS" or forceful puff). Controls expressive output, increases motor drive, and prevents breath-hold stacking.',
+                howTo: 'Purse your lips and blow out forcefully like extinguishing candles. Feel the power transfer into your pull.',
+                when: 'Use during maximal efforts, especially overhangs or powerful sequences. Keeps you from holding your breath while generating force.'
+            },
+            10: {
+                icon: '😮‍💨',
+                title: 'Exhale Dump',
+                subtitle: 'sigh expression',
+                description: 'Full, releasing sigh—let all the air fall out naturally. Converts involuntary "ahhs" into powerful vagal resets that drop tension instantly.',
+                howTo: 'Let your breath fall out with an audible sigh—"AHHHH" or "WHOOO." Don\'t force it; just let go completely.',
+                when: 'Use immediately after dropping from a route or during rest. Instant nervous system reset.'
+            },
+            11: {
+                icon: '💓',
+                title: 'HRR Reset',
+                subtitle: '5-6 BPM coherent',
+                description: 'Slow, rhythmic breathing at 5-6 breaths per minute. Accelerates Heart Rate Recovery (HRR₆₀) and brings breathing rate back toward 30 BPM within 60-120 seconds.',
+                howTo: 'Breathe slowly and deeply—about 5-6 seconds in, 5-6 seconds out. Find a smooth, coherent rhythm that feels calming.',
+                when: 'Use during rests between attempts or routes. Optimal for recovery and preparation for the next climb.'
+            },
+            12: {
+                icon: '🚣',
+                title: 'Rowing Breath',
+                subtitle: 'in-pause-out-pause',
+                description: 'Inhale–pause–exhale–pause (like rowing strokes). Rebuilds CO₂ balance, re-stabilizes breathing rhythm, and clears post-crux chaos.',
+                howTo: 'Breathe in, pause briefly, breathe out, pause briefly. Repeat with steady, controlled timing like rowing a boat.',
+                when: 'Use after chaotic sequences or when you feel your breathing is erratic. Brings you back to baseline.'
+            }
+        };
+
+        function openModal(cardNumber) {
+            const data = breathData[cardNumber];
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <div class="modal-icon">${data.icon}</div>
+                <div class="modal-title">${data.title}</div>
+                <div class="modal-subtitle">${data.subtitle}</div>
+                <div class="modal-description">${data.description}</div>
+                <div class="modal-instructions">
+                    <h3>How to Do It:</h3>
+                    <p>${data.howTo}</p>
+                    <h3 style="margin-top: 20px;">When to Use:</h3>
+                    <p>${data.when}</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (!event || event.target.id === 'modal') {
+                document.getElementById('modal').classList.remove('active');
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.
