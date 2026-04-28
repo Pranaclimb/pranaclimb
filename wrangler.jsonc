@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pranaclimb",
+  "compatibility_date": "2026-04-28",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "1 - 2 Breathing"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
