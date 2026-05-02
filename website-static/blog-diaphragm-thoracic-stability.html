@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diaphragm Strength, Thoracic Stability & Limit Climbing | Pranaclimb</title>
+  <meta name="description" content="Why diaphragm strength and thoracic stability are critical performance factors in climbing. The science, Tim Emmett's rib injury, and 5 field-based training drills — by Annie Anderson, Pranaclimb." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root{--pink:#ff00ff;--lime:#AAFF00;--blue:#89CFF0;--white:#ffffff;--off:#f5f5f2;--ink:#3a3a3a;--mid:#555555;--border:#e0e0d8;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:"Outfit",sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 3rem;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:"Bebas Neue",sans-serif;font-size:1.6rem;letter-spacing:0.12em;color:var(--ink);text-decoration:none;}
+    .nav-logo span{color:var(--pink);}
+    .nav-links{display:flex;gap:2rem;list-style:none;}
+    .nav-links a{font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;color:var(--mid);}
+    .nav-links a:hover{color:var(--pink);}
+    .nav-cta{background:var(--pink);color:var(--white);padding:0.55rem 1.4rem;border-radius:2px;font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;}
+    .article-hero{padding:9rem 4rem 4rem;background:var(--off);border-bottom:1.5px solid var(--border);}
+    .article-hero-inner{max-width:860px;margin:0 auto;}
+    .back-link{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);text-decoration:none;margin-bottom:2rem;}
+    .back-link:hover{color:var(--pink);}
+    .article-cats{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+    .cat-tag{font-size:0.68rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:0.3rem 0.8rem;border-radius:2px;}
+    .cat-tag.pink{background:var(--pink);color:var(--white);}
+    .cat-tag.blue{background:var(--blue);color:var(--ink);}
+    .cat-tag.lime{background:var(--lime);color:var(--ink);}
+    .cat-tag.off{background:var(--ink);color:var(--white);}
+    .article-hero h1{font-family:"Bebas Neue",sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);line-height:0.95;color:var(--ink);margin-bottom:1.2rem;}
+    .article-hero h1 span{color:var(--pink);}
+    .article-lead{font-family:"Lora",serif;font-size:1.1rem;line-height:1.8;color:var(--mid);margin-bottom:2rem;}
+    .article-meta{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;padding-top:1.5rem;border-top:1px solid var(--border);}
+    .meta-author{display:flex;align-items:center;gap:0.8rem;}
+    .meta-author img{width:42px;height:42px;border-radius:50%;object-fit:cover;}
+    .meta-author-name{font-size:0.85rem;font-weight:600;color:var(--ink);}
+    .meta-author-title{font-size:0.72rem;color:var(--mid);}
+    .article-wrap{max-width:1100px;margin:0 auto;padding:4rem;display:grid;grid-template-columns:1fr 220px;gap:4rem;align-items:start;}
+    .article-body h2{font-family:"Bebas Neue",sans-serif;font-size:2rem;color:var(--ink);margin:3rem 0 1rem;}
+    .article-body h3{font-size:1rem;font-weight:700;color:var(--ink);margin:2rem 0 0.8rem;}
+    .article-body p{font-family:"Lora",serif;font-size:0.97rem;line-height:1.95;color:var(--mid);margin-bottom:1.2rem;}
+    .article-body strong{color:var(--ink);font-weight:600;}
+    .article-body a{color:var(--pink);font-weight:600;text-decoration:none;}
+    .article-body a:hover{text-decoration:underline;}
+    .pull-quote{background:var(--pink);padding:2rem 2.5rem;margin:2.5rem 0;border-radius:2px;}
+    .pull-quote blockquote{font-family:"Lora",serif;font-size:1.1rem;font-style:italic;line-height:1.7;color:var(--white);margin-bottom:0.8rem;}
+    .pull-quote cite{font-style:normal;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--lime);font-family:"Outfit",sans-serif;}
+    .hl{background:var(--off);border-left:3px solid var(--lime);padding:1.2rem 1.5rem;margin:1.5rem 0;font-size:0.9rem;line-height:1.7;color:var(--mid);font-family:"Outfit",sans-serif;}
+    .hl.pink{border-left-color:var(--pink);}
+    .hl.blue{background:rgba(137,207,240,0.12);border-left-color:var(--blue);}
+    .hl strong{color:var(--ink);}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin:1.5rem 0;font-family:"Outfit",sans-serif;}
+    .data-table th{background:var(--blue);color:var(--ink);padding:0.8rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+    .data-table td{padding:0.9rem 1rem;border-bottom:1px solid var(--border);color:var(--mid);line-height:1.5;vertical-align:top;}
+    .data-table tr:nth-child(even) td{background:var(--off);}
+    .data-table td strong{color:var(--ink);}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;font-family:"Outfit",sans-serif;}
+    .info-card{background:var(--off);border:1.5px solid var(--border);padding:1.2rem;}
+    .info-card h5{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink);margin-bottom:0.4rem;}
+    .info-card p{font-size:0.83rem;line-height:1.6;color:var(--mid);margin:0;font-family:"Outfit",sans-serif;}
+    .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1.5px solid var(--border);margin:1.5rem 0;font-family:"Outfit",sans-serif;}
+    .metric{background:var(--white);padding:1.2rem;text-align:center;}
+    .metric-val{font-family:"Bebas Neue",sans-serif;font-size:1.8rem;line-height:1;margin-bottom:0.3rem;}
+    .metric-val.pink{color:var(--pink);}
+    .metric-val.lime{color:var(--lime);}
+    .metric-val.blue{color:var(--blue);}
+    .metric-label{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);}
+    .drill-box{background:var(--lime);padding:1.5rem 2rem;margin:1rem 0;border-radius:2px;font-family:"Outfit",sans-serif;}
+    .drill-box h4{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink);margin-bottom:0.6rem;}
+    .drill-box p{font-size:0.87rem;line-height:1.7;color:var(--ink);margin:0;}
+    .article-img{margin:2rem 0;overflow:hidden;}
+    .article-img img{width:100%;display:block;}
+    .article-img figcaption{font-size:0.75rem;color:var(--mid);padding:0.7rem 1rem;background:var(--off);font-family:"Outfit",sans-serif;font-style:italic;}
+    .step-list{list-style:none;display:flex;flex-direction:column;gap:0.7rem;margin:1rem 0;font-family:"Outfit",sans-serif;}
+    .step-list li{display:flex;gap:0.8rem;font-size:0.9rem;color:var(--mid);align-items:flex-start;line-height:1.5;}
+    .references{background:var(--off);padding:2rem;margin:3rem 0;font-family:"Outfit",sans-serif;}
+    .references h3{font-size:0.75rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;}
+    .references ol{padding-left:1.2rem;display:flex;flex-direction:column;gap:0.5rem;}
+    .references li{font-size:0.78rem;color:var(--mid);line-height:1.6;}
+    .article-sidebar{position:sticky;top:6rem;align-self:start;}
+    .sidebar-card{background:var(--off);border:1.5px solid var(--border);padding:1.5rem;margin-bottom:1.2rem;}
+    .sidebar-card h4{font-size:0.72rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;}
+    .sidebar-card ul{list-style:none;display:flex;flex-direction:column;gap:0.5rem;}
+    .sidebar-card li{font-size:0.82rem;color:var(--mid);padding-bottom:0.5rem;border-bottom:1px solid var(--border);}
+    .sidebar-card li:last-child{border-bottom:none;padding-bottom:0;}
+    .sidebar-card a{color:var(--pink);text-decoration:none;font-weight:600;font-size:0.82rem;}
+    .sidebar-cta{background:var(--pink);padding:1.5rem;}
+    .sidebar-cta h4{font-size:0.9rem;font-weight:700;color:var(--white);margin-bottom:0.5rem;}
+    .sidebar-cta p{font-size:0.8rem;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:1rem;}
+    .sidebar-cta a{display:block;background:var(--lime);color:var(--ink);text-align:center;padding:0.7rem;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;}
+    .related{padding:4rem;background:var(--off);border-top:1.5px solid var(--border);}
+    .related-inner{max-width:860px;margin:0 auto;}
+    .related h3{font-family:"Bebas Neue",sans-serif;font-size:1.8rem;color:var(--ink);margin-bottom:2rem;}
+    .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border);border:1.5px solid var(--border);}
+    .related-card{background:var(--white);padding:1.8rem;text-decoration:none;color:inherit;transition:background 0.2s;}
+    .related-card:hover{background:var(--off);}
+    .related-card .cat{font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:0.5rem;}
+    .related-card h4{font-family:"Bebas Neue",sans-serif;font-size:1.3rem;color:var(--ink);line-height:1.1;margin-bottom:0.6rem;}
+    .related-card p{font-size:0.82rem;color:var(--mid);line-height:1.6;}
+    .subscribe-strip{background:var(--blue);padding:4rem;}
+    .subscribe-inner{max-width:600px;margin:0 auto;text-align:center;}
+    .subscribe-inner h3{font-family:"Bebas Neue",sans-serif;font-size:2rem;color:var(--ink);margin-bottom:0.5rem;}
+    .subscribe-inner p{font-size:0.9rem;color:var(--mid);line-height:1.7;margin-bottom:2rem;}
+    .kit-wrapper .formkit-input{font-family:"Outfit",sans-serif!important;font-size:0.9rem!important;padding:0.8rem 1rem!important;border:2px solid rgba(0,0,0,0.15)!important;border-radius:2px!important;}
+    .kit-wrapper .formkit-submit{background-color:#89CFF0!important;font-family:"Outfit",sans-serif!important;font-weight:600!important;letter-spacing:0.12em!important;text-transform:uppercase!important;border-radius:2px!important;border:1.5px solid rgba(255,255,255,0.8)!important;margin-top:0.6rem!important;}
+    footer{background:var(--pink);color:var(--white);padding:4rem;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;}
+    .footer-brand .nav-logo{color:var(--white);display:block;margin-bottom:1rem;}
+    .footer-brand p{font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.85);max-width:260px;}
+    .footer-col h4{font-size:0.8rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1.2rem;}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:0.7rem;}
+    .footer-col a{font-size:1rem;color:rgba(255,255,255,0.85);text-decoration:none;}
+    .footer-col a:hover{color:var(--white);}
+    .footer-col.trading a{font-weight:600;background:rgba(255,255,255,0.2);padding:0.6rem 1rem;border-radius:2px;display:inline-block;}
+    .footer-bottom{background:var(--blue);padding:1.2rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+    .footer-bottom p{font-size:0.75rem;color:rgba(0,0,0,0.5);}
+    .footer-bottom a{color:rgba(0,0,0,0.5);text-decoration:none;}
+    @media(max-width:900px){
+      nav{padding:1rem 1.5rem;}.nav-links{display:none;}
+      .article-hero{padding:6rem 1.5rem 2.5rem;}
+      .article-wrap{grid-template-columns:1fr;padding:2.5rem 1.5rem;gap:2rem;}
+      .article-sidebar{display:none;}
+      .two-col,.metrics-row{grid-template-columns:1fr;}
+      .related-grid{grid-template-columns:1fr;}
+      .related,.subscribe-strip{padding:3rem 1.5rem;}
+      footer{grid-template-columns:1fr;padding:3rem 1.5rem;}
+      .footer-bottom{padding:1rem 1.5rem;flex-direction:column;gap:0.5rem;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PRANA<span>CLIMB</span></a>
+  <ul class="nav-links">
+    <li><a href="methodology.html">Method</a></li>
+    <li><a href="rba.html">RBA</a></li>
+    <li><a href="book.html">Book</a></li>
+    <li><a href="blog.html" style="color:var(--pink);">Blog</a></li>
+    <li><a href="index.html#annie">Annie</a></li>
+    <li><a href="gallery.html">Photos & Videos</a></li>
+  </ul>
+  <a href="rba.html" class="nav-cta">Book Your RBA</a>
+</nav>
+
+<div class="article-hero">
+  <div class="article-hero-inner">
+    <a href="blog.html" class="back-link">← Back to Journal</a>
+    <div class="article-cats">
+      <span class="cat-tag pink">Physiology</span>
+      <span class="cat-tag blue">Breathwork</span>
+      <span class="cat-tag lime">Performance</span>
+      <span class="cat-tag off">Research 2024</span>
+    </div>
+    <h1>Diaphragm Strength,<br>Thoracic Stability &<br><span>Limit Climbing</span></h1>
+    <p class="article-lead">When climbers push to their limit — steep terrain, long power-endurance routes, high psychological stress — the diaphragm and intercostals become both engine and stabiliser. New 2024 research shows diaphragm training increases thickness by 34.6% and transforms postural stability. Here's what that means for climbing.</p>
+    <div class="article-meta">
+      <div class="meta-author">
+        <img src="images/annie-anderson-pranaclimb-founder-cold-water-swimming-cornwall.jpg" alt="Annie Anderson" />
+        <div>
+          <div class="meta-author-name">Annie Anderson</div>
+          <div class="meta-author-title">Researcher · Breathwork Specialist · Climber</div>
+        </div>
+      </div>
+      <span style="font-size:0.78rem;color:var(--mid);">By Annie Anderson · Pranaclimb</span>
+      <span style="font-size:0.78rem;color:var(--pink);font-weight:600;">8 min read</span>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;">
+<div class="article-wrap">
+  <article class="article-body">
+
+    <figure class="article-img">
+      <img src="images/climbing-breathing-assessment-sea-cliff-cornwall-pranaclimb.jpg" alt="Diaphragm strength and thoracic stability — sea cliff climbing, Cornwall" />
+      <figcaption>High-intensity sea cliff climbing demands both respiratory power and thoracic stability — the diaphragm must breathe and stabilise simultaneously. Cornwall.</figcaption>
+    </figure>
+
+    <h2>🫁 The Diaphragm: Engine and Stabiliser</h2>
+    <p>Most climbers think of the diaphragm as a breathing muscle. In reality, it serves a dual role that becomes critical at the limit of effort: <strong>it is simultaneously the primary breathing muscle and a core stabiliser</strong> — generating intra-abdominal pressure to support the spine and rib cage during high-tension movements.</p>
+    <p>On overhanging terrain, at crux sequences, and during long power-endurance efforts, the diaphragm must do both jobs at once. When it can't — when it fatigues, stiffens, or loses coordination with the intercostals — the consequences are visible in the breath, the posture, and eventually the injury record.</p>
+
+    <div class="hl blue">
+      <strong>"Proper functioning of the respiratory system is one of the most important determinants of human health. According to current knowledge, the diaphragmatic breathing pattern seems to be the most favourable."</strong><br>
+      — Seo, Jeong & Chun (2024), Life
+    </div>
+
+    <h2>🔬 The 2024 Research — Diaphragm Training & Postural Stability</h2>
+    <p>A 2024 study in <em>Life</em> investigated the effects of an 8-week diaphragmatic core training programme on postural stability during high-intensity squats. The results have direct implications for climbing performance:</p>
+
+    <div class="metrics-row">
+      <div class="metric"><div class="metric-val pink">+34.6%</div><div class="metric-label">Diaphragm thickness increase — 8 weeks training</div></div>
+      <div class="metric"><div class="metric-val lime">↑↑</div><div class="metric-label">Mean & maximal respiratory pressures improved significantly</div></div>
+      <div class="metric"><div class="metric-val blue">↓ Sway</div><div class="metric-label">Trunk sway reduced — dynamic stability improved under heavy load</div></div>
+    </div>
+
+    <p>The diaphragm-trained group outperformed both the traditional core training group and the control group on every measure — diaphragm thickness, respiratory pressure, and postural stability under load.</p>
+
+    <h3>What This Means for Climbers</h3>
+    <div class="two-col">
+      <div class="info-card">
+        <h5>🫁 Diaphragm isn't just for breathing</h5>
+        <p>A stronger diaphragm generates better intra-abdominal pressure — improving thoracic and spinal stability, postural control under load, and tension efficiency on overhangs.</p>
+      </div>
+      <div class="info-card">
+        <h5>💪 Smoother breathing under stress</h5>
+        <p>Improved respiratory pressure means the diaphragm can support forceful exhales (grunts, power exhales), resist collapse under intra-thoracic pressure, and sustain deeper breaths during recovery.</p>
+      </div>
+      <div class="info-card">
+        <h5>⚡ Whole-body coordination</h5>
+        <p>Better diaphragmatic function → smoother transitions between holds, less unnecessary torso sway, and more economic movement patterns on technical terrain.</p>
+      </div>
+      <div class="info-card">
+        <h5>🩹 Injury prevention</h5>
+        <p>A strong, elastic diaphragm absorbs the intra-thoracic pressure spikes from screams, grunts, and Valsalva holds — reducing the risk of rib displacement and intercostal strain.</p>
+      </div>
+    </div>
+
+    <h2>🧩 Case Study: Tim Emmett & Era Vella</h2>
+    <p>Tim Emmett's rib injury during his 8-year project on Era Vella 9a is a perfect real-world demonstration of what happens when thoracic stability is overwhelmed. During maximal efforts on steep terrain, his diaphragm and intercostals were working under extreme combined load:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>What Was Happening</th><th>The Cost</th><th>Pranaclimb Interpretation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>10+ screams in &lt;60s</strong></td><td>Each scream = +5–10 BPM effective BR · total cap +15 BPM/60s</td><td>Pushes into RCP zone even if raw BR looks low</td></tr>
+        <tr><td><strong>Valsalva-like bracing</strong></td><td>Intra-thoracic pressure surges with each crux hold</td><td>High tension on diaphragm and intercostals</td></tr>
+        <tr><td><strong>Reduced tidal volume</strong></td><td>Less O₂ exchange despite heavy exhale force</td><td>Accelerates W′bal depletion — est. 80–95%</td></tr>
+        <tr><td><strong>Repeated glottal tension</strong></td><td>Scream-induced pressure → rib flare or displacement</td><td>BIQ pillar — flexibility under load is a limiter</td></tr>
+      </tbody>
+    </table>
+
+    <div class="hl pink">
+      <strong>Pranaclimb insight:</strong> Screams aren't "bad" — they're tools. They amplify power output by recruiting core and neural drive. But repeated screaming increases respiratory cost and can destabilise the rib cage when the diaphragm and intercostals aren't strong and elastic enough to absorb it. <strong>Pranaclimb trains expressive efficiency</strong> — the art of using one controlled power exhale where others might use five screams.
+    </div>
+
+    <h2>⚠️ When Thoracic Stability Fails</h2>
+    <p>When the diaphragm and intercostals can't meet the combined demand of breathing and stabilising at limit intensity, a cascade of problems follows:</p>
+
+    <ul class="step-list">
+      <li><span style="color:var(--pink);">→</span><span><strong>Micro-strain or rib displacement</strong> — as seen in Tim Emmett's case. The rib cage can't absorb the pressure spike from a maximal scream or Valsalva hold.</span></li>
+      <li><span style="color:var(--pink);">→</span><span><strong>Reduced O₂ delivery</strong> — restricted thoracic expansion limits tidal volume, raising the ventilatory cost of each breath.</span></li>
+      <li><span style="color:var(--pink);">→</span><span><strong>Metaboreflex activation</strong> — when respiratory muscles fatigue, the body diverts blood flow away from working limbs <em>to the breathing muscles</em> — accelerating forearm pump and W′bal depletion.</span></li>
+      <li><span style="color:var(--pink);">→</span><span><strong>Chest wall stiffness</strong> — fatigued intercostals stiffen the thorax, further restricting breathing and creating a negative feedback loop.</span></li>
+    </ul>
+
+    <div class="pull-quote">
+      <blockquote>"When breath can't move freely, neither can the climber. Train the breath like any other muscle — with awareness, range, and rhythm."</blockquote>
+      <cite>— Pranaclimb</cite>
+    </div>
+
+    <h2>🏋️ 5 Field Drills — No Devices Required</h2>
+    <p>These drills translate directly from the 2024 research into field-ready Pranaclimb training. No equipment needed.</p>
+
+    <div class="drill-box">
+      <h4>1. Slow Nasal Expansion Breathing</h4>
+      <p>Lie or sit upright. On each slow nasal inhale, consciously expand the ribs sideways and backwards — not just forwards. Exhale softly through the nose. 5–10 minutes daily.<br><strong>Builds:</strong> diaphragm mobility, lateral rib expansion, tidal volume.</p>
+    </div>
+
+    <div class="drill-box">
+      <h4>2. Lateral Rib Stretch with Breath Hold</h4>
+      <p>Reach one arm overhead, inhale into the open side of the rib cage. Hold 3–4 seconds. Exhale fully. Repeat both sides. 5 rounds each.<br><strong>Builds:</strong> intercostal elasticity, asymmetrical thoracic mobility — critical for one-arm moves and stemming.</p>
+    </div>
+
+    <div class="drill-box">
+      <h4>3. Hollow-Body Breath Holds</h4>
+      <p>Engage core lightly (hollow body position). Hold the breath 4–6 seconds at mid-inhale. Release smoothly. 5–8 reps.<br><strong>Builds:</strong> diaphragmatic endurance under tension — mimics the combined stabilise-and-breathe demand of crux moves.</p>
+    </div>
+
+    <div class="drill-box">
+      <h4>4. Power Exhale Drills</h4>
+      <p>Short bursts of strong exhale through pursed lips — like blowing out a candle sharply. 10 reps. Keep posture tall, avoid collapsing the chest.<br><strong>Builds:</strong> PEFR (Peak Expiratory Flow Rate) — the Pranaclimb Deep Dive Power pillar. Strong exhale delays metabolic shutdown.</p>
+    </div>
+
+    <div class="drill-box">
+      <h4>5. RP Sync Integration — Climbing-Specific</h4>
+      <p>On easy routes or at clip stances, practise exhale timing during lock-offs and crux moves. One controlled power exhale timed to maximum force application.<br><strong>Builds:</strong> RP Sync — the diaphragm learning to stabilise and exhale simultaneously under climbing-specific load. See <a href="blog-rp-sync.html">RP & RP Sync in the Wild →</a></p>
+    </div>
+
+    <h2>🔗 Integration into Pranaclimb RBA</h2>
+    <p>Diaphragm strength and thoracic stability now integrate directly into the Pranaclimb assessment framework:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>RBA Marker</th><th>What It Reveals</th><th>Coaching Response</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>BIQ — Breathing IQ</strong></td><td>Thoracic expansion symmetry, rib mobility, diaphragm range</td><td>Lateral rib drills, hollow-body holds</td></tr>
+        <tr><td><strong>PEFR — Expiratory Power</strong></td><td>Respiratory muscle strength — ability to generate forceful exhales</td><td>Power exhale drills, Bhastrika pranayama</td></tr>
+        <tr><td><strong>BR at low RPE</strong></td><td>Excessive BR rise at low effort = weak or stiff respiratory system</td><td>Nasal expansion breathing, mobility work</td></tr>
+        <tr><td><strong>Expressive breathing cost</strong></td><td>Scream density, BH frequency — reveals intercostal load</td><td>Expressive efficiency training, RP Sync</td></tr>
+        <tr><td><strong>Recovery BR</strong></td><td>How fast BR drops post-crux — reveals respiratory muscle fatigue</td><td>Cyclic sighing, NRP protocol</td></tr>
+      </tbody>
+    </table>
+
+    <div class="hl">
+      <strong>Field diagnostic cues (no devices):</strong> Watch for shallow breathing · Chest lift dominance rather than rib expansion · "Frozen ribs" — thorax barely moving · Breath held throughout crux sequences · BR spike disproportionate to RPE
+    </div>
+
+    <div class="references">
+      <h3>References</h3>
+      <ol>
+        <li>Seo, H., Jeong, G., & Chun, B. (2024). Impact of diaphragm-strengthening core training on postural stability in high-intensity squats. <em>Life, 14</em>(12), 1612. https://doi.org/10.3390/life14121612</li>
+        <li>Chin, S. (2024). The role of torso stiffness and prediction in the biomechanics of anxiety: a narrative review. <em>Frontiers in Sports and Active Living.</em> https://doi.org/10.3389/fspor.2024.1487862</li>
+        <li>Anderson, A. (2025). The Pranaclimb Methodology: Non-invasive tracking of Critical Power and W′bal modelling in rock climbing using Breathing Rate, RPE, and HRR. <em>SportRxiv.</em> https://doi.org/10.51224/SRXIV.578</li>
+      </ol>
+    </div>
+
+  </article>
+
+  <aside class="article-sidebar">
+    <div class="sidebar-card">
+      <h4>In This Article</h4>
+      <ul>
+        <li>Diaphragm as Stabiliser</li>
+        <li>2024 Research — +34.6%</li>
+        <li>Tim Emmett Case Study</li>
+        <li>When Stability Fails</li>
+        <li>5 Field Drills</li>
+        <li>RBA Integration</li>
+      </ul>
+    </div>
+    <div class="sidebar-card">
+      <h4>Related Reading</h4>
+      <ul>
+        <li><a href="blog-tim-emmett-era-vella.html">Tim Emmett & Era Vella</a></li>
+        <li><a href="blog-rp-sync.html">RP & RP Sync</a></li>
+        <li><a href="blog-micro-breath-holds.html">Micro-Breath Holds</a></li>
+        <li><a href="blog-bhastrika-pranayama.html">Bhastrika — PEFR Training</a></li>
+        <li><a href="rba.html">Book Your RBA</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-cta">
+      <h4>Assess Your BIQ</h4>
+      <p>The BIQ — Breathing IQ — is one of the five Deep Dive pillars in your RBA. Book your assessment.</p>
+      <a href="rba.html">Book Your RBA →</a>
+    </div>
+  </aside>
+</div>
+</div>
+
+<div class="related">
+  <div class="related-inner">
+    <h3>More From the Journal</h3>
+    <div class="related-grid">
+      <a href="blog-tim-emmett-era-vella.html" class="related-card">
+        <div class="cat">Elite Analysis · Case Study</div>
+        <h4>Tim Emmett & Era Vella</h4>
+        <p>Eight years. 130 days. The full Pranaclimb perspective on W′bal, breathwork, and the psychological cost of a long project.</p>
+      </a>
+      <a href="blog-rp-sync.html" class="related-card">
+        <div class="cat">Elite Analysis · Neuroscience</div>
+        <h4>RP & RP Sync in the Wild</h4>
+        <p>Will Bosi and Jimmy Webb — the neuroscience of timing breath to movement. Power exhale as performance tool.</p>
+      </a>
+      <a href="blog-bhastrika-pranayama.html" class="related-card">
+        <div class="cat">Breathwork · Performance</div>
+        <h4>Bhastrika Pranayama</h4>
+        <p>The Bellows Breath — pre-climb lung priming, PEFR improvement, and diaphragm activation.</p>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="subscribe-strip">
+  <div class="subscribe-inner">
+    <h3>Subscribe to the Journal</h3>
+    <p>Breathing science, climbing research, and early access to <em>Pranaclimb: Love, Breathe, Climb</em>. Free first chapter when you subscribe.</p>
+    <div class="kit-wrapper">
+      <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
+      <form action="https://app.kit.com/forms/9354489/subscriptions" class="seva-form formkit-form" method="post" data-sv-form="9354489" data-uid="3d6cc9da4e" data-format="inline" data-version="5">
+        <div data-style="clean">
+          <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+          <div data-element="fields" data-stacked="false" class="seva-fields formkit-fields">
+            <div class="formkit-field">
+              <input class="formkit-input" name="email_address" placeholder="Your email address" required="" type="email" style="color:#3a3a3a;border-color:#e3e3e3;border-radius:2px;">
+            </div>
+            <button data-element="submit" class="formkit-submit" style="color:#3a3a3a;background-color:#89CFF0;border-radius:2px;font-weight:600;border:1.5px solid rgba(255,255,255,0.8);">
+              <div class="formkit-spinner"><div></div><div></div><div></div></div>
+              <span>Subscribe</span>
+            </button>
+          </div>
+          <div class="formkit-powered-by-convertkit-container">
+            <a href="https://kit.com" data-element="powered-by" class="formkit-powered-by-convertkit" data-variant="dark" target="_blank" rel="nofollow">Built with Kit</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <a href="index.html" class="nav-logo" style="color:var(--white)">PRANA<span style="color:var(--lime)">CLIMB</span></a>
+    <p>The Science of Breathing for Climbing Performance. Love Breathe Climb.</p>
+    <p style="font-size:0.78rem;margin-top:1rem;color:rgba(255,255,255,0.6);">annie@pranaclimb.com</p>
+  </div>
+  <div class="footer-col"><h4>Blog</h4><ul>
+    <li><a href="blog.html">All Posts</a></li>
+    <li><a href="blog-tim-emmett-era-vella.html">Tim Emmett Case Study</a></li>
+    <li><a href="blog-rp-sync.html">RP & RP Sync</a></li>
+    <li><a href="blog-bhastrika-pranayama.html">Bhastrika Pranayama</a></li>
+    <li><a href="blog-capillarization.html">Capillarization</a></li>
+  </ul></div>
+  <div class="footer-col"><h4>More</h4><ul>
+    <li><a href="methodology.html">Methodology Q&A</a></li>
+    <li><a href="rba.html">Remote Assessment</a></li>
+    <li><a href="book.html">The Book</a></li>
+    <li><a href="terms.html">Terms</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ul></div>
+  <div class="footer-col trading"><h4>Trading As</h4><ul>
+    <li><a href="https://www.pranaclimb.com">🧗 Pranaclimb</a></li>
+    <li><a href="https://oceandips.com" target="_blank">🌊 Ocean Dips</a></li>
+  </ul></div>
+</footer>
+<div class="footer-bottom">
+  <div><p>pranaclimb.com is a trading name of Pranaclimb Ltd. Registered in England & Wales, Company No. 16626114.</p></div>
+  <div style="display:flex;gap:1.5rem;flex-shrink:0;margin-left:2rem;">
+    <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+  </div>
+</div>
+
+</body>
+</html>
