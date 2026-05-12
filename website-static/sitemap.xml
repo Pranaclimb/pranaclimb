@@ -40,6 +40,26 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pranaclimb.com/blog-tim-emmett-era-vella.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-capillarization.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-bhastrika-pranayama.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-spleen-breath-holding.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.pranaclimb.com/blog-rpe-breathing-rate.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -78,3 +98,18 @@
   </url>
 
 </urlset>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-rp-sync.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-tim-emmett-era-vella.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pranaclimb.com/blog-diaphragm-thoracic-stability.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
