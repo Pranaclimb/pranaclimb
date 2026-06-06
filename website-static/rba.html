@@ -46,7 +46,6 @@
     .hero-stat .stat-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);}
     .hero-stat p{font-size:0.82rem;color:var(--mid);line-height:1.5;margin-top:0.3rem;}
 
-    /* INTRO STRIP */
     .intro-strip{background:var(--off);padding:3rem 4rem;border-bottom:1.5px solid var(--border);}
     .intro-strip p{font-size:1rem;color:var(--mid);line-height:1.8;max-width:800px;}
     .intro-strip strong{color:var(--ink);}
@@ -57,10 +56,9 @@
     .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4vw,3rem);color:var(--ink);line-height:1;margin-bottom:0.5rem;}
     .divider{width:48px;height:3px;background:var(--lime);margin:0.8rem 0 3rem;}
 
-    .step{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;padding:4rem 0;border-bottom:1.5px solid var(--border);}
+    .step{display:block;padding:2.5rem 0;border-bottom:1.5px solid var(--border);gap:5rem;align-items:center;padding:4rem 0;border-bottom:1.5px solid var(--border);}
     .step:last-child{border-bottom:none;}
     .step.reverse .step-content{order:2;}
-    .step.reverse .step-visual{order:1;}
 
     .step-num{font-family:'Bebas Neue',sans-serif;font-size:0.72rem;letter-spacing:0.2em;color:var(--mid);margin-bottom:0.3rem;}
     .step-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:0.03em;line-height:1;margin-bottom:0.5rem;}
@@ -75,23 +73,9 @@
     .step-list li .dot.lime{background:var(--lime);}
     .step-list li .dot.blue{background:var(--blue);}
 
-    .arrow-down{text-align:center;padding:1rem 0;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:0.2em;color:var(--mid);}
-    .arrow-down span{font-size:1.5rem;display:block;color:var(--pink);}
 
     /* STEP VISUAL PANELS */
-    .step-visual{border-radius:2px;overflow:hidden;}
-    .panel-assess{background:var(--pink);padding:3rem;display:flex;flex-direction:column;gap:0;}
-    .panel-interpret{background:var(--blue);padding:3rem;}
-    .panel-identify{background:var(--off);border:1.5px solid var(--border);padding:3rem;}
-    .panel-coach{background:var(--lime);padding:3rem;}
-    .panel-adapt{background:var(--off);border:1.5px solid var(--border);padding:3rem;}
-    .panel-climb{background:#5a5a5a;padding:3rem;}
 
-    .panel-step-label{font-size:0.65rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem;}
-    .panel-step-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;line-height:1;margin-bottom:1.5rem;}
-    .panel-items{display:flex;flex-direction:column;gap:0.8rem;}
-    .panel-item{display:flex;align-items:flex-start;gap:0.8rem;font-size:0.88rem;line-height:1.5;}
-    .panel-item-icon{flex-shrink:0;font-size:1rem;width:1.5rem;text-align:center;}
 
     /* PROTOCOL DETAIL */
     .protocol-section{background:var(--off);padding:6rem 4rem;}
@@ -151,7 +135,6 @@
       nav{padding:1rem 1.5rem;} .nav-links{display:none;}
       .hero,.process,.protocol-section,.optional-section,.who-section,.booking-section{padding:4rem 1.5rem;}
       .hero,.step,.booking-section{grid-template-columns:1fr;}
-      .step.reverse .step-content,.step.reverse .step-visual{order:unset;}
       .protocol-grid{grid-template-columns:1fr;}
       .optional-grid,.who-grid{grid-template-columns:repeat(2,1fr);}
       footer{grid-template-columns:1fr;padding:3rem 1.5rem;}
@@ -209,10 +192,6 @@
   </div>
 </div>
 
-<!-- INTRO STRIP -->
-<div class="intro-strip">
-  <p>This protocol blends <strong>cutting-edge physiology with practical breathwork coaching</strong>, helping you recognise thresholds (CP & RCP) through breathing patterns, train smarter, recover faster, and build resilience through targeted breathwork tools. <strong>Breathe strong. Love, Breathe, Climb.</strong></p>
-</div>
 
 <!-- 6-STEP PROCESS -->
 <section class="process">
@@ -236,32 +215,10 @@
       </ul>
       <p style="font-size:0.8rem;font-style:italic;color:var(--mid);margin-top:1rem;">What's measured in the real world</p>
     </div>
-    <div class="step-visual">
-      <div class="panel-assess">
-        <div class="panel-step-label" style="color:rgba(255,255,255,0.7);">Step 01</div>
-        <div class="panel-step-title" style="color:var(--white);">ASSESS<br><span style="color:var(--lime);">RBA</span></div>
-        <div class="panel-items">
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">
-            <span class="panel-item-icon">🫁</span>Breathing Rate (BR) — real-time effort
-          </div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">
-            <span class="panel-item-icon">🎯</span>RPE (CR-10) — perceived load
-          </div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">
-            <span class="panel-item-icon">😤</span>Expressive breathing — holds, grunts, screams
-          </div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">
-            <span class="panel-item-icon">❤️</span>HRR₆₀ — 60s recovery
-          </div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.7);font-size:0.82rem;margin-top:0.5rem;">
-            <span class="panel-item-icon">+</span>Optional: CO₂, PEFR, SpO₂, rib mobility
-          </div>
-        </div>
+  </div>
       </div>
     </div>
   </div>
-
-  <div class="arrow-down"><span>⬇</span>What's measured in the real world</div>
 
   <!-- STEP 2: INTERPRET -->
   <div class="step reverse">
@@ -279,15 +236,7 @@
       </ul>
       <p style="font-size:0.8rem;font-style:italic;color:var(--mid);margin-top:1rem;">What it means</p>
     </div>
-    <div class="step-visual">
-      <div class="panel-interpret">
-        <div class="panel-step-label" style="color:rgba(0,0,0,0.5);">Step 02</div>
-        <div class="panel-step-title" style="color:var(--ink);">INTERPRET</div>
-        <div style="display:flex;flex-direction:column;gap:1rem;">
-          <div style="background:rgba(255,255,255,0.6);padding:1rem 1.2rem;border-radius:2px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--ink);">⛰️ ~45 BPM / RPE 8</div>
-            <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Critical Power (CP)</div>
-          </div>
+  </div>
           <div style="background:rgba(255,0,255,0.15);padding:1rem 1.2rem;border-radius:2px;">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--pink);">🔥 &gt;55 BPM / RPE 9–10</div>
             <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Resp. Compensation Point</div>
@@ -300,8 +249,6 @@
       </div>
     </div>
   </div>
-
-  <div class="arrow-down"><span>⬇</span>What it means</div>
 
   <!-- STEP 3: IDENTIFY -->
   <div class="step">
@@ -321,24 +268,10 @@
       </ul>
       <p style="font-size:0.8rem;font-style:italic;color:var(--mid);margin-top:1rem;">Why effort feels harder than it should</p>
     </div>
-    <div class="step-visual">
-      <div class="panel-identify">
-        <div class="panel-step-label" style="color:var(--pink);">Step 03</div>
-        <div class="panel-step-title" style="color:var(--ink);">IDENTIFY<br>LIMITERS</div>
-        <div class="panel-items">
-          <div class="panel-item" style="color:var(--mid);">⚠️ Early BR spike</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ Excessive breath holds</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ High expressive cost</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ Slow HRR₆₀</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ Poor CO₂ tolerance</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ Rib stiffness</div>
-          <div class="panel-item" style="color:var(--mid);">⚠️ Chaotic breathing under stress</div>
-        </div>
+  </div>
       </div>
     </div>
   </div>
-
-  <div class="arrow-down"><span>⬇</span>Why effort feels harder than it should</div>
 
   <!-- STEP 4: COACH -->
   <div class="step reverse">
@@ -354,22 +287,10 @@
       </ul>
       <p style="font-size:0.8rem;font-style:italic;color:var(--mid);margin-top:1rem;">What to do differently</p>
     </div>
-    <div class="step-visual">
-      <div class="panel-coach">
-        <div class="panel-step-label" style="color:rgba(0,0,0,0.5);">Step 04</div>
-        <div class="panel-step-title" style="color:var(--ink);">COACH<br>CoPro</div>
-        <div class="panel-items">
-          <div class="panel-item" style="color:var(--ink);">🧭 Zone-based breathing cues</div>
-          <div class="panel-item" style="color:var(--ink);">💨 Expressive efficiency training</div>
-          <div class="panel-item" style="color:var(--ink);">🌬 Recovery optimisation</div>
-          <div class="panel-item" style="color:var(--ink);">🧘‍♀️ CO₂ resilience & calm</div>
-          <div class="panel-item" style="color:var(--ink);">🧩 Integrated breath awareness</div>
-        </div>
+  </div>
       </div>
     </div>
   </div>
-
-  <div class="arrow-down"><span>⬇</span>What to do differently</div>
 
   <!-- STEP 5: ADAPT -->
   <div class="step">
@@ -387,22 +308,10 @@
       </ul>
       <p style="font-size:0.8rem;font-style:italic;color:var(--mid);margin-top:1rem;">Change becomes automatic</p>
     </div>
-    <div class="step-visual">
-      <div class="panel-adapt">
-        <div class="panel-step-label" style="color:var(--pink);">Step 05</div>
-        <div class="panel-step-title" style="color:var(--ink);">ADAPT</div>
-        <div class="panel-items">
-          <div class="panel-item" style="color:var(--mid);">✅ Breath-aware pacing</div>
-          <div class="panel-item" style="color:var(--mid);">✅ Better crux timing</div>
-          <div class="panel-item" style="color:var(--mid);">✅ Faster recovery</div>
-          <div class="panel-item" style="color:var(--mid);">✅ Composure under stress</div>
-          <div class="panel-item" style="color:var(--mid);">✅ Reduced injury risk</div>
-        </div>
+  </div>
       </div>
     </div>
   </div>
-
-  <div class="arrow-down"><span>⬇</span>Change becomes automatic</div>
 
   <!-- STEP 6: CLIMB -->
   <div class="step reverse">
@@ -422,17 +331,7 @@
         <p style="font-size:1.1rem;font-style:italic;color:var(--ink);font-weight:500;">✨ Love. Breathe. Climb.</p>
       </div>
     </div>
-    <div class="step-visual">
-      <div class="panel-climb">
-        <div class="panel-step-label" style="color:rgba(255,255,255,0.5);">Step 06</div>
-        <div class="panel-step-title" style="color:var(--white);">CLIMB<br><span style="color:var(--lime);">STRONGER</span></div>
-        <div class="panel-items" style="margin-top:1rem;">
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">⛰️ Hold CP longer</div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">🔥 Push RCP with control</div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">❤️ Recover faster</div>
-          <div class="panel-item" style="color:rgba(255,255,255,0.9);">🧘 Stay calm under pressure</div>
-          <div class="panel-item" style="color:var(--lime);font-weight:600;margin-top:1rem;">✨ Love. Breathe. Climb.</div>
-        </div>
+  </div>
       </div>
     </div>
   </div>
