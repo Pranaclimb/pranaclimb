@@ -356,7 +356,9 @@ pages.forEach((_,i) => {
 
 function updateUI(){
   document.querySelectorAll('.dot').forEach((d,i)=>d.className='dot'+(i===current?' active':''));
-  pageInfo.textContent = 'Spread '+(current+1)+' / '+total;
+  const startPage = 14 + (current * 2);
+  const endPage = startPage + 1;
+  pageInfo.textContent = 'Pages ' + startPage + '–' + endPage;
   prevBtn.disabled = current===0;
   nextBtn.disabled = current===total-1;
 }
