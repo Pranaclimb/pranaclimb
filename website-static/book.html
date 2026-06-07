@@ -29,7 +29,7 @@
 
     /* HERO */
     .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:72px;}
-    .hero-left{background:var(--off);display:flex;flex-direction:column;justify-content:center;padding:5rem 4rem;}
+    .hero-left{background:var(--white);display:flex;flex-direction:column;justify-content:center;padding:5rem 4rem;}
     .hero-label{font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;}
     .hero-left h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,6vw,5.5rem);line-height:0.9;letter-spacing:0.02em;color:var(--ink);margin-bottom:0.5rem;}
     .hero-left h1 .sub{font-size:clamp(1.8rem,3vw,2.5rem);color:var(--mid);display:block;}
@@ -47,19 +47,19 @@
     .btn-primary:hover{background:#cc00cc;}
     .btn-secondary{display:inline-block;border:2px solid var(--ink);color:var(--ink);padding:0.85rem 2rem;font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all 0.2s;}
     .btn-secondary:hover{background:var(--ink);color:var(--white);}
-    .hero-right{background:var(--off);display:flex;align-items:center;justify-content:center;padding:4rem;position:relative;}
+    .hero-right{background:var(--white);display:flex;align-items:center;justify-content:center;padding:4rem;position:relative;}
     .hero-right img{max-width:320px;width:100%;box-shadow:20px 30px 60px rgba(0,0,0,0.2);transform:rotate(-2deg);border-radius:2px;}
     .coming-badge{position:absolute;bottom:3rem;right:3rem;background:var(--lime);padding:0.7rem 1.2rem;font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);border-radius:2px;}
 
     /* CHAPTER 1 TEASER */
-    .chapter-hero{background:#5a5a5a;padding:7rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;}
-    .chapter-label{font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--lime);margin-bottom:1rem;}
-    .chapter-hero h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,5vw,4.5rem);line-height:0.95;color:var(--white);margin-bottom:1rem;}
+    .chapter-hero{background:var(--blue);padding:7rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;}
+    .chapter-label{font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;}
+    .chapter-hero h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,5vw,4.5rem);line-height:0.95;color:var(--ink);margin-bottom:1rem;}
     .chapter-hero h2 span{color:var(--pink);}
     .chapter-insight{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;padding:1rem;background:rgba(255,255,255,0.05);border-left:3px solid var(--lime);}
     .chapter-insight-icon{font-size:1.2rem;flex-shrink:0;}
     .chapter-insight p{font-size:0.88rem;color:rgba(255,255,255,0.8);line-height:1.6;margin:0;}
-    .chapter-insight strong{color:var(--lime);}
+    .chapter-insight strong{color:var(--pink);}
 
     /* QUOTES STRIP */
     .quotes-strip{background:var(--pink);padding:5rem 4rem;overflow:hidden;}
@@ -67,10 +67,10 @@
     .quotes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.2);}
     .quote-card{background:rgba(255,255,255,0.1);padding:2.5rem 2rem;}
     .quote-card blockquote{font-family:'Lora',serif;font-size:0.95rem;font-style:italic;line-height:1.8;color:var(--white);margin-bottom:1rem;}
-    .quote-attr{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--lime);}
+    .quote-attr{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--pink);}
 
     /* KEY TAKEAWAYS */
-    .takeaways{background:var(--off);padding:7rem 4rem;}
+    .takeaways{background:var(--white);padding:7rem 4rem;}
     .section-label{font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:0.5rem;}
     .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4vw,3rem);color:var(--ink);line-height:1;margin-bottom:0.5rem;}
     .divider{width:48px;height:3px;background:var(--lime);margin:0.8rem 0 2.5rem;}
@@ -159,7 +159,7 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-left">
-    <div class="hero-label">Coming Soon · Pre-Order Now</div>
+    <div class="hero-label">Pranaclimb · Love, Breathe, Climb</div>
     <h1>PRANACLIMB<br>
       <span class="sub">LOVE,</span>
       <span class="sub">BREATHE,</span>
@@ -176,13 +176,44 @@
       <span class="theme-tag off">Flow States</span>
     </div>
     <div class="hero-btns">
-      <a href="mailto:annie@pranaclimb.com" class="btn-primary">Pre-Order Your Copy</a>
-      <a href="pranaclimb-chapter1-flipbook.html" class="btn-secondary">📖 Read Chapter I Free</a>
+      <a href="book.html" class="btn-primary">Read More &rarr;</a>
+      <a href="pranaclimb-chapter1-flipbook.html" target="_blank" class="btn-secondary">Chapter I &mdash; Free &rarr;</a>
+    </div>
+
+    <div style="margin-top:2rem; padding-top:2rem; border-top:1px solid rgba(0,0,0,0.1);">
+      <p style="font-size:0.82rem; font-weight:600; color:var(--mid); margin-bottom:0.8rem; letter-spacing:0.05em;">Get a free PDF copy — subscribe below:</p>
+      <style>
+        .book-hero-kit .formkit-input{font-family:'Outfit',sans-serif !important;font-size:0.88rem !important;padding:0.75rem 1rem !important;border:1.5px solid var(--border) !important;border-radius:2px !important;}
+        .book-hero-kit .formkit-submit{background-color:#ff00ff !important;font-family:'Outfit',sans-serif !important;font-weight:600 !important;letter-spacing:0.12em !important;text-transform:uppercase !important;border-radius:2px !important;border:none !important;margin-top:0.6rem !important;}
+        .book-hero-kit .formkit-powered-by-convertkit-container{justify-content:flex-start;}
+        .book-hero-kit .formkit-powered-by-convertkit{font-size:0.6rem !important;opacity:0.4;}
+      </style>
+      <div class="book-hero-kit">
+        <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
+        <form action="https://app.kit.com/forms/9354489/subscriptions" class="seva-form formkit-form" method="post" data-sv-form="9354489" data-uid="3d6cc9da4e" data-format="inline" data-version="5">
+          <div data-style="clean">
+            <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+            <div data-element="fields" data-stacked="false" class="seva-fields formkit-fields">
+              <div class="formkit-field">
+                <input class="formkit-input" name="email_address" aria-label="Email Address" placeholder="Your email address" required="" type="email" style="color:#3a3a3a;border-radius:2px;font-weight:400;">
+              </div>
+              <button data-element="submit" class="formkit-submit" style="color:#fff;background-color:#ff00ff;border-radius:2px;font-weight:600;">
+                <div class="formkit-spinner"><div></div><div></div><div></div></div>
+                <span>Send me the PDF</span>
+              </button>
+            </div>
+            <div class="formkit-powered-by-convertkit-container">
+              <a href="https://kit.com/features/forms?utm_campaign=poweredby&utm_content=form&utm_medium=referral&utm_source=dynamic" data-element="powered-by" class="formkit-powered-by-convertkit" data-variant="dark" target="_blank" rel="nofollow">Built with Kit</a>
+            </div>
+          </div>
+        </form>
+      </div>
+      <p style="font-size:0.75rem; color:var(--mid); margin-top:0.6rem; line-height:1.6;">📧 Please remember to confirm your subscription in the email you receive.</p>
     </div>
   </div>
   <div class="hero-right">
     <img src="images/pranaclimb-love-breathe-climb-book-annie-anderson.jpg" alt="Pranaclimb: Love, Breathe, Climb by Annie Anderson" />
-    <div class="coming-badge">Coming 2025</div>
+    <div class="coming-badge">Coming 2026</div>
   </div>
 </div>
 
@@ -193,7 +224,6 @@
     <h2>LOVE,<br>BREATHE,<br><span>CLIMB</span></h2>
     <p style="font-size:0.95rem;color:rgba(255,255,255,0.7);line-height:1.8;margin-bottom:2rem;">The opening chapter explores love as the foundation of climbing performance — not just a feeling, but a drive. A force that regulates breath, sustains effort, and powers flow.</p>
     <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-      <a href="pranaclimb-chapter1-flipbook.html" style="display:inline-block;background:var(--lime);color:var(--ink);padding:0.8rem 1.8rem;font-size:0.82rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;">📖 Flip Through Chapter I →</a>
       <a href="#signup" style="display:inline-block;border:1.5px solid rgba(255,255,255,0.4);color:var(--white);padding:0.8rem 1.8rem;font-size:0.82rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;">Get Free Chapter</a>
     </div>
   </div>
@@ -308,7 +338,19 @@
     </div>
     <div style="text-align:center;margin-top:3rem;">
       <p style="font-size:0.9rem;color:var(--mid);margin-bottom:1.5rem;font-style:italic;">Want to read the full chapter? Sign up below and get it free.</p>
-      <a href="pranaclimb-chapter1-flipbook.html" style="display:inline-block;background:var(--pink);color:var(--white);padding:0.9rem 2.5rem;font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;">📖 Flip Through Chapter I Free →</a>
+    </div>
+
+    <!-- EMBEDDED FLIPBOOK -->
+    <div style="margin-top:3rem; border:1.5px solid var(--border); border-radius:4px; overflow:hidden; background:var(--blue);">
+      <div style="padding:1rem 1.5rem; background:var(--blue); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink);">Chapter I — Interactive Flipbook</p>
+        <a href="pranaclimb-chapter1-flipbook.html" target="_blank" style="font-size:0.72rem; font-weight:600; color:var(--mid); text-decoration:none; letter-spacing:0.08em; text-transform:uppercase;">Open Full Screen ↗</a>
+      </div>
+      <iframe src="pranaclimb-chapter1-flipbook.html" 
+        style="width:100%; height:600px; border:none; display:block;"
+        title="Pranaclimb Chapter I Flipbook"
+        loading="lazy">
+      </iframe>
     </div>
   </div>
 </section>
