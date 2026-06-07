@@ -57,6 +57,10 @@
       transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--pink); }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; background:none; border:none; }
+    .hamburger span { width:24px; height:2px; background:var(--ink); border-radius:2px; display:block; transition:all 0.3s; }
+    .nav-links.open { display:flex !important; flex-direction:column; position:fixed; top:60px; left:0; right:0; background:rgba(255,255,255,0.98); backdrop-filter:blur(12px); padding:1.5rem 2rem; gap:0.8rem; border-bottom:1px solid var(--border); z-index:99; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+    .nav-links.open li a { font-size:1rem; padding:0.4rem 0; display:block; }
     .nav-cta {
       background: var(--pink); color: var(--white);
       padding: 0.55rem 1.4rem;
@@ -542,6 +546,9 @@
     @media (max-width: 900px) {
       nav { padding: 1rem 1.5rem; }
       .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-social { display: none; }
+      .nav-cta { display: none; }
       section { padding: 4rem 1.5rem; }
       #hero, #assessment, #app, #book, #annie {
         grid-template-columns: 1fr;
@@ -603,7 +610,10 @@
     <li><a href="#annie">Annie</a></li>
     <li><a href="gallery.html">Photos</a></li>
   </ul>
-  <div style="display:flex; align-items:center; gap:0.8rem;">
+  <button class="hamburger" onclick="this.closest('nav').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-social" style="display:flex; align-items:center; gap:0.8rem;">
     <a href="rba.html" class="nav-cta">Book Your RBA</a>
     <a href="https://www.instagram.com/pranaclimb/" target="_blank" title="Instagram" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:2px; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#ff00ff" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#ff00ff" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#ff00ff"/></svg>
