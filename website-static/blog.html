@@ -62,12 +62,19 @@
     .feature-badge{display:inline-block;background:var(--lime);color:var(--ink);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:0.25rem 0.7rem;border-radius:2px;margin-bottom:1rem;}
 
     /* POSTS GRID */
-    .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border);border:1.5px solid var(--border);margin-bottom:3rem;}
+    .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border);border:1.5px solid var(--border);margin-bottom:3rem;align-items:stretch;}
     .post-card{background:var(--white);transition:background 0.2s;}
     .post-card:hover{background:var(--off);}
     .post-card-img{overflow:hidden;aspect-ratio:4/3;}
     .post-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
     .post-card:hover .post-card-img img{transform:scale(1.04);}
+    .posts-grid .post-card{display:flex;flex-direction:column;height:100%;}
+    .posts-grid .post-card-content{flex:1;display:flex;flex-direction:column;}
+    .posts-grid .post-card-content p{flex:1;}
+    .post-grid .post-card{display:flex;flex-direction:column;height:100%;}
+    .post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border);border:1.5px solid var(--border);margin-bottom:3rem;align-items:stretch;}
+    .post-grid .post-card-content{flex:1;display:flex;flex-direction:column;}
+    .post-grid .post-card-content p{flex:1;}
     .post-card-content{padding:1.8rem;}
     .post-card h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.8rem;}
     .post-card p{font-size:0.85rem;line-height:1.7;color:var(--mid);margin-bottom:1.2rem;}
@@ -367,6 +374,123 @@
             <span class="post-date">By Annie Anderson</span>
             <span class="read-more-sm">Read →</span>
           </div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- NEW POSTS SECTION -->
+  <div style="margin-bottom:2rem;">
+    <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;">New Posts</p>
+  </div>
+
+  <div class="post-grid">
+
+    <a href="blog-grey-zone.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/climbing-breathing-assessment-sea-cliff-cornwall-pranaclimb.jpg" alt="The Grey Zone — BR thresholds in climbing" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Physiology · Performance</div>
+          <h3>The Grey Zone: The Knife-Edge Between Your Redpoint and Coming Off</h3>
+          <p>The narrow physiological band between CP and RCP where composure and breath control determine whether you send. Caen et al. (2022).</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-heart-rate-fails-climbers.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/pranaclimb-remote-breathing-assessment-app-climbers.jpg" alt="Why heart rate fails climbers" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Physiology · Science</div>
+          <h3>Why Heart Rate Fails Climbers — And What to Use Instead</h3>
+          <p>Five reasons HR is unreliable in climbing. Isometric contractions, fear, metaboreflex, and lag. Nicolò, Fryer, Keir.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-science-of-screaming.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/rock-climbing-breath-holds-bosigran-cornwall-pranaclimb.jpg" alt="The science of screaming in climbing" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Science · Performance</div>
+          <h3>The Science of Screaming: Why Your Grunt Costs You Energy</h3>
+          <p>Aliverti et al. showed vocalisations recruit all three chest-wall compartments. When screaming helps — and when it costs. Ohya, Chen, Satoh.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-respiratory-motor-coupling.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/pranayama-yoga-climbing-breathwork-annie-anderson-cornwall.jpg" alt="Respiratory motor coupling in climbing" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Neuroscience · Science</div>
+          <h3>Respiratory-Motor Coupling: Why Breathing and Movement Are the Same Thing</h3>
+          <p>Brainstem, motor cortex, and diaphragm work as one. Why breathwork is movement training. Park, Li (2023/2025).</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-metaboreflex.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/climbing-breathing-assessment-sea-cliff-cornwall-pranaclimb.jpg" alt="The metaboreflex in climbing" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Physiology · Performance</div>
+          <h3>The Metaboreflex: Why Your Forearms Pump When Your Breathing Fails</h3>
+          <p>Fatigued breathing muscles divert blood away from your forearms. Train your inspiratory muscles or pay the price. Sheel, Vogiatzis, Griffiths.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-effective-breathing-rate.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/pranaclimb-remote-breathing-assessment-app-climbers.jpg" alt="Effective breathing rate in climbing" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Methodology · Science</div>
+          <h3>Effective Breathing Rate: The Number That Actually Matters</h3>
+          <p>Raw breath counting misses the real physiological cost. How the Effective BR correction model works — with a worked example.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-co2-hidden-superpower.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/co2-tolerance-breathwork-cold-water-swimming-cornwall.jpg" alt="CO2 tolerance climbing hidden superpower" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Breathwork · Performance</div>
+          <h3>Why CO₂ Tolerance is the Climber's Hidden Superpower</h3>
+          <p>The pump isn't just lactic acid — it's CO₂ making your brain panic. Train your tolerance and stay calmer at the crux.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-three-breath-cues.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/rock-climbing-breath-holds-bosigran-cornwall-pranaclimb.jpg" alt="Three breath cues for climbing crux moves" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Technique · Performance</div>
+          <h3>Three Breath Cues to Use Before Your Next Crux Move</h3>
+          <p>Three cues — one at the rest, one through the sequence, one at the hardest move. Simple, immediately applicable.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
+        </div>
+      </div>
+    </a>
+
+    <a href="blog-recovery-protocol.html" style="text-decoration:none;color:inherit;">
+      <div class="post-card">
+        <div class="post-card-img"><img src="images/breathing-rate-climbing-performance-annie-anderson-bouldering.jpg" alt="Breathwork recovery protocol for climbers" loading="lazy"/></div>
+        <div class="post-card-content">
+          <div class="post-category">Recovery · Breathwork</div>
+          <h3>Breathwork for Faster Climbing Recovery: The Protocol I Use</h3>
+          <p>A 10-minute post-session breathing routine. Cyclic sighing, slow nasal breathing, diaphragm reset. The science and the practice.</p>
+          <div class="post-card-footer"><span class="post-date">By Annie Anderson</span><span class="read-more-sm">Read →</span></div>
         </div>
       </div>
     </a>
