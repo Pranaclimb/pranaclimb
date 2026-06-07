@@ -240,10 +240,41 @@
   .footer a:hover{color:var(--pink);}
   .footer-sep{color:rgba(0,0,0,0.15);font-size:0.6rem;}
 
-  @media(max-width:600px){
+  .mobile-pdf{display:none;}
+  @media(max-width:700px){
+    body{padding:20px 16px 48px;}
     .logo{font-size:1.8rem;}
-    .btn{padding:8px 18px;font-size:0.72rem;}
-    .hint{display:none;}
+    .book-wrap{display:none !important;}
+    .controls{display:none !important;}
+    .mobile-pdf{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      padding:2rem 1.5rem;
+      background:var(--off);
+      border:1.5px solid var(--border);
+      border-radius:4px;
+      width:100%;
+      max-width:400px;
+      margin:0 auto;
+      gap:1rem;
+    }
+    .mobile-pdf p{font-size:0.9rem;line-height:1.7;color:var(--mid);}
+    .mobile-pdf a.pdf-btn{
+      display:block;
+      width:100%;
+      background:var(--pink);
+      color:#fff;
+      padding:1rem 1.5rem;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.5rem;
+      letter-spacing:0.1em;
+      text-decoration:none;
+      border-radius:2px;
+      text-align:center;
+    }
+    .mobile-pdf .pdf-note{font-size:0.72rem;color:rgba(0,0,0,0.35);letter-spacing:0.1em;text-transform:uppercase;}
   }
 </style>
 </head>
@@ -261,7 +292,14 @@
 
 <div class="chapter-label">
   <div class="title">Chapter I — Free Preview</div>
-  <div class="sub">Click the page to turn · ← → keys · Swipe on mobile</div>
+  <div class="sub">Click the page to turn · ← → keys</div>
+</div>
+
+<!-- MOBILE: PDF fallback -->
+<div class="mobile-pdf">
+  <p>For the best reading experience on mobile, open the chapter as a PDF — pinch to zoom, scroll naturally.</p>
+  <a href="/assets/pranaclimb-chapter1.pdf" target="_blank" class="pdf-btn">📖 Read Chapter 1</a>
+  <span class="pdf-note">Opens in your browser · Free to read</span>
 </div>
 
 <!-- BOOK -->
