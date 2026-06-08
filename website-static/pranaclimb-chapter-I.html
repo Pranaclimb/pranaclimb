@@ -242,7 +242,7 @@
 
   .mobile-pdf{display:none;}
   @media(max-width:700px){
-    body{padding:20px 16px 48px;}
+    body{padding:12px 8px 40px;}
     .logo{font-size:1.8rem;}
     .book-wrap{display:none !important;}
     .controls{display:none !important;}
@@ -260,6 +260,22 @@
       margin:0 auto;
       gap:1rem;
     }
+    .mobile-pdf p{font-size:0.9rem;line-height:1.7;color:var(--mid);}
+    .mobile-pdf a.pdf-btn{
+      display:block;
+      width:100%;
+      background:var(--pink);
+      color:#fff;
+      padding:1rem 1.5rem;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.5rem;
+      letter-spacing:0.1em;
+      text-decoration:none;
+      border-radius:2px;
+      text-align:center;
+    }
+    .mobile-pdf .pdf-note{font-size:0.72rem;color:rgba(0,0,0,0.35);letter-spacing:0.1em;text-transform:uppercase;}
+  }
     .mobile-pdf p{font-size:0.9rem;line-height:1.7;color:var(--mid);}
     .mobile-pdf a.pdf-btn{
       display:block;
@@ -298,7 +314,7 @@
 <!-- MOBILE: PDF fallback -->
 <div class="mobile-pdf">
   <p>For the best reading experience on mobile, open the chapter as a PDF — pinch to zoom, scroll naturally.</p>
-  <a href="https://www.pranaclimb.com/pranaclimb-chapter-I.html?view=full" target="_blank" class="pdf-btn">📖 Read Chapter I — Full Screen</a>
+  <a href="https://www.pranaclimb.com/pranaclimb-chapter-I.pdf" target="_blank" class="pdf-btn">📖 Read Chapter I — Free PDF</a>
   <span class="pdf-note">Opens in your browser · Free to read</span>
 </div>
 
