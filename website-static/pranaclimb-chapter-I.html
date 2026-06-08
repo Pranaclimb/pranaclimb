@@ -298,7 +298,7 @@
 <!-- MOBILE: PDF fallback -->
 <div class="mobile-pdf">
   <p>For the best reading experience on mobile, open the chapter as a PDF — pinch to zoom, scroll naturally.</p>
-  <a href="https://www.pranaclimb.com/pranaclimb-chapter-I.html" target="_blank" class="pdf-btn">📖 Read Chapter I — Full Screen</a>
+  <a href="https://www.pranaclimb.com/pranaclimb-chapter-I.html?view=full" target="_blank" class="pdf-btn">📖 Read Chapter I — Full Screen</a>
   <span class="pdf-note">Opens in your browser · Free to read</span>
 </div>
 
@@ -430,6 +430,14 @@ updateUI();
 
 function openFullSize(){
   window.open(pages[current], '_blank');
+}
+</script>
+<script>
+// If ?view=full in URL, bypass mobile and show flipbook
+if(window.location.search.includes('view=full')){
+  document.querySelector('.mobile-pdf') && (document.querySelector('.mobile-pdf').style.display='none');
+  document.querySelector('.book-wrap') && (document.querySelector('.book-wrap').style.display='block');
+  document.querySelector('.controls') && (document.querySelector('.controls').style.display='flex');
 }
 </script>
 </body>
