@@ -260,39 +260,16 @@
       margin:0 auto;
       gap:1rem;
     }
-    .mobile-pdf p{font-size:0.9rem;line-height:1.7;color:var(--mid);}
-    .mobile-pdf a.pdf-btn{
-      display:block;
-      width:100%;
-      background:var(--pink);
-      color:#fff;
-      padding:1rem 1.5rem;
-      font-family:'Bebas Neue',sans-serif;
-      font-size:1.5rem;
-      letter-spacing:0.1em;
-      text-decoration:none;
-      border-radius:2px;
-      text-align:center;
-    }
-    .mobile-pdf .pdf-note{font-size:0.72rem;color:rgba(0,0,0,0.35);letter-spacing:0.1em;text-transform:uppercase;}
-  }
-    .mobile-pdf p{font-size:0.9rem;line-height:1.7;color:var(--mid);}
-    .mobile-pdf a.pdf-btn{
-      display:block;
-      width:100%;
-      background:var(--pink);
-      color:#fff;
-      padding:1rem 1.5rem;
-      font-family:'Bebas Neue',sans-serif;
-      font-size:1.5rem;
-      letter-spacing:0.1em;
-      text-decoration:none;
-      border-radius:2px;
-      text-align:center;
-    }
+
     .mobile-pdf .pdf-note{font-size:0.72rem;color:rgba(0,0,0,0.35);letter-spacing:0.1em;text-transform:uppercase;}
   }
 </style>
+<script>
+  // Show flipbook if ?view=full in URL
+  if(window.location.search.includes('view=full')){
+    document.write('<style>.mobile-pdf{display:none!important;}.book-wrap{display:block!important;}.controls{display:flex!important;}</style>');
+  }
+</script>
 </head>
 <body>
 
@@ -338,6 +315,8 @@
 
 <div class="footer">
   <a href="https://www.pranaclimb.com" target="_blank">pranaclimb.com</a>
+  <span class="footer-sep">·</span>
+  <a href="https://www.pranaclimb.com/book.html" target="_blank">The Book</a>
   <span class="footer-sep">·</span>
   <a href="https://www.pranaclimb.com/rba.html" target="_blank">Book Your RBA</a>
   <span class="footer-sep">·</span>
@@ -448,13 +427,6 @@ function openFullSize(){
   window.open(pages[current], '_blank');
 }
 </script>
-<script>
-// If ?view=full in URL, bypass mobile and show flipbook
-if(window.location.search.includes('view=full')){
-  document.querySelector('.mobile-pdf') && (document.querySelector('.mobile-pdf').style.display='none');
-  document.querySelector('.book-wrap') && (document.querySelector('.book-wrap').style.display='block');
-  document.querySelector('.controls') && (document.querySelector('.controls').style.display='flex');
-}
-</script>
+
 </body>
 </html>
