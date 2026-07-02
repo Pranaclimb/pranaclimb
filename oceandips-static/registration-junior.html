@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junior Registration Form (Under 18) | Ocean Dips & Pranaclimb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ocean-deep: #0a3d4a;
+      --ocean-mid: #0b8a8a;
+      --ocean-bright: #00c9c9;
+      --baby-blue: #89CFF0;
+      --hot-pink: #ff00ff;
+      --sand: #f0fbfb;
+    }
+    body { font-family: 'DM Sans', sans-serif; color: var(--ocean-deep); background: var(--sand); padding: 2rem 1rem 4rem; }
+    .container { max-width: 720px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--ocean-deep); margin-bottom: 0.4rem; }
+    header p { color: var(--ocean-mid); font-size: 0.95rem; }
+    .logo-line { font-size: 0.85rem; font-style: italic; color: var(--hot-pink); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+    .guardian-banner { background: rgba(255,63,142,0.08); border: 1px solid rgba(255,63,142,0.25); border-radius: 14px; padding: 1rem 1.5rem; margin-bottom: 2rem; font-size: 0.92rem; color: var(--ocean-deep); line-height: 1.6; }
+    .guardian-banner strong { color: var(--hot-pink); }
+    .card { background: white; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.8rem; border: 1px solid rgba(0,201,201,0.15); }
+    .card h2 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--ocean-mid); margin-bottom: 1.2rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(0,201,201,0.15); }
+    .card h3 { font-size: 0.95rem; font-weight: 600; color: var(--ocean-deep); margin: 1.4rem 0 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .field { margin-bottom: 1.2rem; }
+    .field label { display: block; font-size: 0.88rem; font-weight: 500; color: var(--ocean-deep); margin-bottom: 0.3rem; letter-spacing: 0.02em; }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 0.7rem 1rem; border: 1px solid rgba(0,150,150,0.25);
+      border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      color: var(--ocean-deep); background: var(--sand); transition: border 0.2s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      outline: none; border-color: var(--ocean-bright); background: white;
+    }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .risk-box { background: rgba(0,201,201,0.05); border: 1px solid rgba(0,201,201,0.2); border-radius: 12px; padding: 1.2rem 1.5rem; font-size: 0.88rem; line-height: 1.7; color: #1a6a6a; margin-bottom: 1.2rem; }
+    .risk-box strong { color: var(--ocean-deep); }
+    .sig-area { margin-top: 1rem; }
+    .sig-area .field label { font-weight: 600; }
+    .print-note { text-align: center; background: rgba(255,63,142,0.07); border: 1px solid rgba(255,63,142,0.2); border-radius: 14px; padding: 1.2rem; margin-bottom: 2rem; font-size: 0.92rem; color: var(--ocean-deep); line-height: 1.6; }
+    .print-note strong { color: var(--hot-pink); }
+    .divider { border: none; border-top: 1px solid rgba(0,201,201,0.15); margin: 1.4rem 0; }
+    @media print {
+      body { background: white; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+      .print-note, .guardian-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } .card { padding: 1.2rem 1.2rem; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="logo-line">Ocean Dips · Pranaclimb Ltd</span>
+    <h1>Junior Registration Form</h1>
+    <p>For participants under 18 years of age · To be completed by parent or guardian</p>
+  </header>
+
+  <div class="guardian-banner">
+    <strong>Important:</strong> Under 18s must be accompanied by a parent or guardian at all times during the immersion. This form must be completed and signed by a parent or legal guardian prior to participation.
+  </div>
+
+  <div class="print-note">
+    <strong>How to submit:</strong> Print and complete, then photograph or scan and email to <strong>annie@pranaclimb.com</strong><br>
+    — or fill in digitally, save as PDF and send.
+  </div>
+
+  <!-- Young Person's Details -->
+  <div class="card">
+    <h2>Young Person's Details</h2>
+    <div class="two-col">
+      <div class="field"><label>Full Name</label><input type="text"></div>
+      <div class="field"><label>Date of Birth</label><input type="date"></div>
+    </div>
+    <div class="field"><label>Address</label><textarea rows="2"></textarea></div>
+    <div class="two-col">
+      <div class="field"><label>Mobile (if applicable)</label><input type="tel"></div>
+      <div class="field"><label>Email (if applicable)</label><input type="email"></div>
+    </div>
+    <div class="field"><label>Preferred Dates</label><input type="text" placeholder="e.g. 14–16 August 2026"></div>
+    <div class="two-col">
+      <div class="field">
+        <label>Experience Type</label>
+        <select>
+          <option value="">Select…</option>
+          <option>SOLO (£900)</option>
+          <option>1:2 Shared (£690pp)</option>
+        </select>
+      </div>
+      <div class="field"><label>How did you hear about us?</label><input type="text"></div>
+    </div>
+  </div>
+
+  <!-- Parent / Guardian Details -->
+  <div class="card">
+    <h2>Parent / Guardian Details</h2>
+    <div class="two-col">
+      <div class="field"><label>Full Name</label><input type="text"></div>
+      <div class="field"><label>Relationship to Young Person</label><input type="text" placeholder="e.g. Mother, Father, Guardian"></div>
+    </div>
+    <div class="field"><label>Address (if different)</label><textarea rows="2"></textarea></div>
+    <div class="two-col">
+      <div class="field"><label>Mobile</label><input type="tel"></div>
+      <div class="field"><label>Email</label><input type="email"></div>
+    </div>
+
+    <hr class="divider">
+    <h3>Emergency Contact (if different from above)</h3>
+    <div class="two-col">
+      <div class="field"><label>Name</label><input type="text"></div>
+      <div class="field"><label>Relationship</label><input type="text"></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Phone (Primary)</label><input type="tel"></div>
+      <div class="field"><label>Phone (Secondary)</label><input type="tel"></div>
+    </div>
+  </div>
+
+  <!-- Health & Medical -->
+  <div class="card">
+    <h2>Health &amp; Medical</h2>
+    <p style="font-size:0.88rem;color:#4a8a8a;margin-bottom:1rem;">All information is kept strictly confidential and used only to ensure the young person's safety and wellbeing.</p>
+    <div class="field"><label>Medical conditions, allergies, or significant disabilities (e.g. high/low blood pressure, asthma, epilepsy, ear or eye conditions, heart conditions)</label><textarea></textarea></div>
+    <div class="field"><label>Current or recent injuries</label><textarea></textarea></div>
+    <div class="field"><label>Any medications currently being taken</label><textarea></textarea></div>
+    <div class="field"><label>Swimmer? (Confident in open water / some experience / non-swimmer)</label><input type="text" placeholder="e.g. Confident open water swimmer"></div>
+    <div class="field"><label>Climbing experience (How long? Where? Grade? Last climbed outdoors?)</label><textarea></textarea></div>
+    <div class="field"><label>Any other information you'd like Annie to know</label><textarea></textarea></div>
+  </div>
+
+  <!-- Photo / Media Consent -->
+  <div class="card">
+    <h2>Photo &amp; Media Consent</h2>
+    <p style="font-size:0.88rem;color:#4a8a8a;margin-bottom:1rem;">Occasionally Ocean Dips captures images or short video clips during sessions for use on social media and the website. No images of under 18s will be shared without explicit consent.</p>
+    <div class="field">
+      <label>Do you consent to photographs or video being taken of the young person for Ocean Dips / Pranaclimb social media and website?</label>
+      <select>
+        <option value="">Select…</option>
+        <option>Yes — I consent</option>
+        <option>No — I do not consent</option>
+        <option>Yes — with prior approval of each image</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Acknowledgement of Risk -->
+  <div class="card">
+    <h2>Acknowledgement of Risk</h2>
+    <div class="risk-box">
+      <p style="margin-bottom:0.8rem;">Ocean Dips and Pranaclimb Ltd activities — including cold-water immersion, breathwork, and climbing — take place in coastal and outdoor environments where inherent risks exist. These include but are not limited to: slips and falls on uneven or wet terrain, changing weather and sea conditions, physical and mental demands, and the residual risks inherent to adventure activities.</p>
+      <p style="margin-bottom:0.8rem;"><strong>Pranaclimb Ltd holds full professional indemnity and public liability insurance with Insure4Sport (Underwritten by Aviva Insurance Limited).</strong> Annie Anderson holds a current first aid certificate and carries a full first aid kit on all sessions.</p>
+      <p style="margin-bottom:0.8rem;">Under 18s must be accompanied by a parent or guardian at all times. As the parent or legal guardian, you are asked to acknowledge that adventure activities carry inherent risk and to consent to your child's participation on that basis.</p>
+      <p>Signing this form does not compromise your or your child's legal rights, nor does it release Annie Anderson or Pranaclimb Ltd from their duty of care.</p>
+    </div>
+    <div class="sig-area">
+      <div class="two-col">
+        <div class="field"><label>Print Name (Parent / Guardian)</label><input type="text"></div>
+        <div class="field"><label>Date</label><input type="date"></div>
+      </div>
+      <div class="field"><label>Signature</label><input type="text" placeholder="Sign above — AND print out and sign by hand" style="border-style:dashed;"></div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font-size:0.85rem;color:#4a8a8a;margin-top:1.5rem;">
+    Return completed form to <strong>annie@pranaclimb.com</strong> · Ocean Dips | Pranaclimb Ltd · Cornwall
+  </p>
+
+</div>
+</body>
+</html>
