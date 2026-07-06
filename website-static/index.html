@@ -199,7 +199,7 @@
 
     /* ─── ASSESSMENT ─────────────────────────────────── */
     #assessment { padding-top: 2.5rem;
-      background: var(--blue); color: var(--ink);
+      background: var(--white); color: var(--ink);
       display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
       align-items: center;
     }
@@ -297,7 +297,7 @@
       content: '';
       flex-shrink: 0;
       width: 8px; height: 8px;
-      background: var(--blue); border-radius: 50%;
+      background: var(--white); border-radius: 50%;
     }
     .app-mockup {
       background: var(--pink);
@@ -332,7 +332,7 @@
     .app-btns { display: flex; gap: 0.8rem; }
     .btn-blue {
       display: inline-block;
-      background: var(--blue); color: var(--ink);
+      background: var(--white); color: var(--ink);
       padding: 0.75rem 1.5rem;
       font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; text-decoration: none;
@@ -528,7 +528,7 @@
       border-top: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center;
     }
-    .footer-bottom p { font-size: 0.75rem; color: rgba(0,0,0,0.5); }
+    .footer-bottom p { font-size: 0.75rem; color: var(--mid); }
     .footer-bottom a { color: rgba(0,0,0,0.5); text-decoration: none; transition: color 0.2s; }
     .footer-bottom a:hover { color: var(--pink); }
 
@@ -705,7 +705,7 @@
   </div>
   <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
     <a href="breathing.html" style="display:inline-block; background:var(--pink); color:var(--white); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Breathing Toolbox &rarr;</a>
-    <a href="https://www.pranaclimb.com/elite-analysis" target="_blank" style="display:inline-block; background:var(--blue); color:var(--ink); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Elite Analysis &rarr;</a>
+    <a href="https://www.pranaclimb.com/elite-analysis" target="_blank" style="display:inline-block; background:var(--white); color:var(--ink); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Elite Analysis &rarr;</a>
     <a href="https://pranaclimb.github.io/Pranaclimb-Energy-Calculator/" target="_blank" style="display:inline-block; background:var(--lime); color:var(--ink); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Energy Cost Calculator &rarr;</a>
     <a href="https://pranaclimb.github.io/breathing-regulation/" target="_blank" style="display:inline-block; border:1.5px solid var(--border); color:var(--mid); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Breathing Regulation &rarr;</a>
     <a href="https://pranaclimb.github.io/Energy-Calculator-Info/" target="_blank" style="display:inline-block; border:1.5px solid var(--border); color:var(--mid); padding:0.85rem 2rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Calculator Info &rarr;</a>
@@ -766,6 +766,71 @@
 <!-- BLOG -->
 <section id="blog" style="background:var(--lime); padding:2.5rem 4rem; text-align:center;">
   <p style="font-size:0.95rem; line-height:1.8; color:var(--ink);">19 science-backed posts on breathing for climbing &mdash; <a href="blog.html" style="color:var(--pink); font-weight:700; text-decoration:none;">Read the Blog &rarr;</a></p>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="background:var(--lime); padding:4rem;">
+
+  <div style="text-align:center; margin-bottom:2.5rem;">
+    <h2 class="section-title">The Breath-Led Performance System for Climbers</h2>
+    <div class="divider" style="margin:1rem auto 1.5rem;"></div>
+    <p style="font-size:1rem; font-weight:400; line-height:1.8; color:var(--ink); max-width:580px; margin:0 auto;">Breathing regulates effort, delays fatigue, and accelerates recovery while climbing &mdash; start breathing better, start climbing stronger.</p>
+  </div>
+
+  <div class="services-mini-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:1.5px; background:var(--border); border:1.5px solid var(--border); margin-bottom:2rem; max-width:1100px; margin-left:auto; margin-right:auto;">
+
+    <div style="background:var(--white); padding:1.8rem; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="font-size:1.8rem; margin-bottom:0.6rem;">🫁</div>
+        <div style="font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink); margin-bottom:0.4rem;">Assessment</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--ink); line-height:1.1; margin-bottom:0.6rem;">Remote Breathing Assessment</h3>
+        <p style="font-size:0.82rem; line-height:1.6; color:var(--mid); margin-bottom:0.5rem;">Discover how your breathing affects your climbing with a personalised analysis and report.</p>
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--pink);">£69</div>
+        <div style="font-size:0.72rem; color:var(--mid); margin-top:0.2rem;">Valid for 6 months</div>
+      </div>
+      <a href="services.html" style="display:inline-block; margin-top:1rem; background:var(--pink); color:#fff; padding:0.7rem 1.2rem; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Find Out More &rarr;</a>
+    </div>
+
+    <div style="background:var(--white); padding:1.8rem; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="font-size:1.8rem; margin-bottom:0.6rem;">🔥</div>
+        <div style="font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink); margin-bottom:0.4rem;">Bundle</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--ink); line-height:1.1; margin-bottom:0.6rem;">Coaching Bundle</h3>
+        <p style="font-size:0.82rem; line-height:1.6; color:var(--mid); margin-bottom:0.5rem;">CoPro + 5 sessions + email support. The complete Pranaclimb performance package.</p>
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--pink);">£288</div>
+      </div>
+      <a href="services.html" style="display:inline-block; margin-top:1rem; background:var(--pink); color:#fff; padding:0.7rem 1.2rem; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Find Out More &rarr;</a>
+    </div>
+
+    <div style="background:var(--white); padding:1.8rem; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="font-size:1.8rem; margin-bottom:0.6rem;">🎯</div>
+        <div style="font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink); margin-bottom:0.4rem;">1:1 Coaching</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--ink); line-height:1.1; margin-bottom:0.6rem;">Coaching Session</h3>
+        <p style="font-size:0.82rem; line-height:1.6; color:var(--mid); margin-bottom:0.5rem;">One hour online with Annie via Microsoft Teams. Tailored to your goals and experience.</p>
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--pink);">£60</div>
+      </div>
+      <a href="services.html" style="display:inline-block; margin-top:1rem; background:var(--pink); color:#fff; padding:0.7rem 1.2rem; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Find Out More &rarr;</a>
+    </div>
+
+    <div style="background:var(--white); padding:1.8rem; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="font-size:1.8rem; margin-bottom:0.6rem;">🧗‍♀️</div>
+        <div style="font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pink); margin-bottom:0.4rem;">In-Person · Cornwall</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--ink); line-height:1.1; margin-bottom:0.6rem;">Full Day Coaching</h3>
+        <p style="font-size:0.82rem; line-height:1.6; color:var(--mid); margin-bottom:0.5rem;">A full day with Annie on the sea cliffs of West Cornwall. Climbing, breathing, movement.</p>
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--pink);">£350</div>
+      </div>
+      <a href="services.html" style="display:inline-block; margin-top:1rem; background:var(--pink); color:#fff; padding:0.7rem 1.2rem; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">Find Out More &rarr;</a>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;">
+    <a href="services.html" style="display:inline-block; background:var(--pink); color:#fff; padding:0.85rem 2.5rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px;">View All Services &amp; Pricing &rarr;</a>
+    <a href="mailto:annie@pranaclimb.com?subject=Services Enquiry" style="display:inline-block; background:var(--lime); color:var(--ink); padding:0.85rem 2.5rem; font-size:0.82rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; border-radius:2px; margin-left:1rem;">Email Annie &rarr;</a>
+  </div>
+
 </section>
 
 <!-- ANNIE -->
@@ -906,9 +971,10 @@
   </div>
 
   <div class="footer-col">
-    <h4 style="color:var(--mid);">Insurance &amp; Qualifications</h4>
+    <h4 style="color:var(--mid);">Pranaclimb Ltd</h4>
     <p style="font-size:0.78rem; line-height:1.8; color:var(--mid);">
-      Pranaclimb Ltd holds full professional indemnity and public liability insurance with <strong style="color:var(--ink);">Insure4Sport</strong> (Underwritten by Aviva Insurance Limited) covering all OceanDips and rock climbing on sea cliffs, traditional climbing, and leading.<br><br>
+      Specialising in breathing, cold-water immersion, and sea-cliff climbing experiences.<br><br>
+      Pranaclimb Ltd holds full professional indemnity and public liability insurance with <strong style="color:var(--ink);">Insure4Sport</strong> covering all OceanDips and rock climbing on sea cliffs, traditional climbing, and leading.<br><br>
       Annie is a qualified <strong style="color:var(--ink);">SPA/RCI Rock Climbing Instructor</strong> (1998) and <strong style="color:var(--ink);">Registered Yoga Teacher RYT 200</strong> (2012). Annie holds a current first aid certificate and carries a full first aid kit on all sessions.
     </p>
   </div>
